@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: genetic-counseling-competition
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: CHAT_MODE
+        value: ai
+      - key: DEEPSEEK_MODEL
+        value: deepseek-chat
+      - key: DEEPSEEK_API_KEY
+        sync: false

@@ -1,0 +1,2557 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GenCounsel-AI（医遗智训）医学遗传咨询训练智能体</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #f4f6f8;
+      color: #1f2937;
+    }
+
+    .app {
+      max-width: 1400px;
+      margin: 0 auto;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+    }
+
+    .header {
+      padding: 18px 22px;
+      border-bottom: 1px solid #e5e7eb;
+      background: #ffffff;
+      flex: 0 0 auto;
+    }
+
+    .title {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .subtitle {
+      margin: 6px 0 0;
+      font-size: 14px;
+      color: #6b7280;
+      line-height: 1.5;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1d4ed8;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.4;
+      white-space: nowrap;
+    }
+
+    .badge.green {
+      background: #ecfdf5;
+      border-color: #a7f3d0;
+      color: #047857;
+    }
+
+    .badge.gray {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+      color: #475569;
+    }
+
+    .main {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .sidebar {
+      width: 260px;
+      border-right: 1px solid #e5e7eb;
+      padding: 18px;
+      background: #fafafa;
+      overflow-y: auto;
+      flex: 0 0 auto;
+    }
+
+    .right-panel {
+      width: 320px;
+      border-left: 1px solid #e5e7eb;
+      padding: 18px;
+      background: #fafafa;
+      overflow-y: auto;
+      flex: 0 0 auto;
+    }
+
+    .sidebar h2,
+    .right-panel h2 {
+      font-size: 16px;
+      margin: 0 0 12px;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 13px;
+      color: #374151;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 14px;
+      background: #fff;
+      font-family: inherit;
+    }
+
+    .field textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    .chat-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .chat-box {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      background: #f9fafb;
+      min-height: 0;
+    }
+
+    .message {
+      max-width: 78%;
+      margin-bottom: 14px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      line-height: 1.6;
+      font-size: 15px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .message.patient {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-top-left-radius: 6px;
+    }
+
+    .message.student {
+      background: #dbeafe;
+      margin-left: auto;
+      border-top-right-radius: 6px;
+    }
+
+    .message.system {
+      margin: 0 auto 16px;
+      background: #fef3c7;
+      border: 1px solid #fcd34d;
+      color: #92400e;
+      text-align: center;
+      max-width: 90%;
+    }
+
+    .message.material-card {
+      margin: 0 auto 16px;
+      background: #eff6ff;
+      border: 1px solid #93c5fd;
+      color: #1e3a8a;
+      max-width: 90%;
+    }
+
+    .message.material-detail {
+      margin: 0 auto 16px;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      color: #0f172a;
+      max-width: 90%;
+    }
+
+    .material-title {
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .material-desc {
+      margin-bottom: 10px;
+      line-height: 1.6;
+    }
+
+    .material-btn {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .material-btn:hover {
+      opacity: 0.92;
+    }
+
+    .material-pre {
+      margin: 8px 0 0;
+      white-space: pre-wrap;
+      line-height: 1.7;
+      font-family: inherit;
+    }
+
+    .message-role {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #6b7280;
+    }
+
+    .panel {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .panel-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin: 0 0 10px;
+    }
+
+    .test-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .test-item {
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      padding: 10px;
+      background: #fff;
+    }
+
+    .test-name {
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .test-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tiny {
+      font-size: 12px;
+      color: #6b7280;
+      line-height: 1.5;
+    }
+
+    .intro-note,
+    .demo-guide {
+      border: 1px solid #bfdbfe;
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: #eff6ff;
+      color: #1e3a8a;
+      font-size: 13px;
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+
+    .advanced-settings {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: #ffffff;
+      margin-top: 14px;
+    }
+
+    .advanced-settings summary {
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+      color: #374151;
+    }
+
+    .advanced-settings .field:first-of-type {
+      margin-top: 12px;
+    }
+
+    .result-card {
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      padding: 12px;
+      background: #ffffff;
+      margin-top: 10px;
+      white-space: pre-wrap;
+      line-height: 1.6;
+    }
+
+    .result-title {
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .warning {
+      margin-top: 8px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: #fff7ed;
+      border: 1px solid #fdba74;
+      color: #9a3412;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .success-note {
+      margin-top: 8px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: #ecfdf5;
+      border: 1px solid #6ee7b7;
+      color: #065f46;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .limit-note {
+      margin-top: 10px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: #eff6ff;
+      border: 1px solid #93c5fd;
+      color: #1d4ed8;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 8px 0;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #ffffff;
+      border: 1px solid #93c5fd;
+      color: #1d4ed8;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .flow-list {
+      margin: 8px 0 0 18px;
+      padding: 0;
+      color: #1e3a8a;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .demo-buttons {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .demo-buttons button {
+      padding: 8px 10px;
+      border-radius: 10px;
+      font-size: 13px;
+    }
+
+    .score-card {
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      padding: 12px;
+      background: #ffffff;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    .score-total {
+      font-size: 24px;
+      font-weight: 800;
+      color: #1d4ed8;
+      margin-bottom: 8px;
+    }
+
+    .score-level {
+      display: inline-block;
+      margin-bottom: 8px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #ecfdf5;
+      color: #047857;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .score-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 10px;
+      margin: 8px 0 10px;
+      font-size: 13px;
+    }
+
+    .input-area {
+      border-top: 1px solid #e5e7eb;
+      padding: 14px;
+      background: #ffffff;
+      flex: 0 0 auto;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
+    .input-row textarea {
+      flex: 1;
+      min-height: 52px;
+      max-height: 160px;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 14px;
+      font-size: 15px;
+      resize: vertical;
+      font-family: inherit;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .primary { background: #2563eb; color: #fff; }
+    .secondary { background: #e5e7eb; color: #111827; }
+    .danger { background: #dc2626; color: #fff; }
+
+    .muted {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 1100px) {
+      body {
+        overflow: auto;
+      }
+
+      .app {
+        height: auto;
+        min-height: 100vh;
+      }
+
+      .main {
+        flex-direction: column;
+        overflow: visible;
+      }
+
+      .sidebar,
+      .right-panel {
+        width: 100%;
+        border-right: none;
+        border-left: none;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .chat-area {
+        overflow: visible;
+      }
+
+      .chat-box {
+        min-height: 400px;
+      }
+
+      .message {
+        max-width: 90%;
+      }
+
+      .demo-buttons {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1 class="title">GenCounsel-AI（医遗智训）</h1>
+      <p class="subtitle">医学遗传咨询情景模拟与反馈训练智能体。评委可直接体验 AI 患者对话、检查路径选择、既往资料调取、风险解释训练与五维形成性评价；在线后端不可用时自动进入本地演示模式。</p>
+      <div class="badge-row" aria-label="系统能力">
+        <span class="badge">9个遗传咨询病例</span>
+        <span class="badge green">AI患者对话</span>
+        <span class="badge green">Down病例完整闭环</span>
+        <span class="badge">检查路径训练</span>
+        <span class="badge">五维评分</span>
+        <span class="badge gray">断网可演示</span>
+      </div>
+    </header>
+
+    <main class="main">
+      <!-- 左侧设置栏 -->
+      <aside class="sidebar">
+        <h2>问诊设置</h2>
+
+        <div class="field">
+          <label for="groupName">小组名称</label>
+          <input id="groupName" type="text" placeholder="例如：第1组" value="第1组" />
+        </div>
+
+        <div class="field">
+          <label for="caseSelect">选择病例</label>
+          <select id="caseSelect"></select>
+        </div>
+
+        <div class="field">
+          <label for="caseBasicInfo">病例基本信息</label>
+          <textarea id="caseBasicInfo" readonly></textarea>
+        </div>
+
+        <button class="secondary" id="startBtn">开始问诊</button>
+        <p class="muted">点击后将当前病例的患者开场白写入聊天区。后端不可用时使用本地病例库。</p>
+
+        <div class="intro-note">建议评委体验流程：选择病例，点击开始问诊，输入学生问诊内容，按需调取既往资料或选择检查，最后结束问诊生成五维评分。</div>
+
+        <details class="advanced-settings">
+          <summary>在线连接与运行状态</summary>
+
+          <div class="field">
+            <label for="apiEndpoint">后端接口地址</label>
+            <input id="apiEndpoint" type="text" placeholder="例如：https://your-backend.example.com/api/chat" value="" />
+          </div>
+
+          <div class="field">
+            <label for="modeSelect">对话模式</label>
+            <select id="modeSelect">
+              <option value="ai">AI 模式</option>
+              <option value="mock">Mock 模式</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="statusBox">连接状态</label>
+            <textarea id="statusBox" readonly>尚未开始加载病例</textarea>
+          </div>
+
+          <div class="field">
+            <label for="currentModeBox">当前返回模式</label>
+            <textarea id="currentModeBox" readonly>尚未开始问诊</textarea>
+          </div>
+        </details>
+      </aside>
+
+      <!-- 中间聊天区 -->
+      <section class="chat-area">
+        <div class="chat-box" id="chatBox">
+          <div class="message system">
+            <span class="message-role">系统提示</span>
+            正在加载病例；如在线 AI 后端不可用，将自动进入本地演示模式。
+          </div>
+        </div>
+
+        <div class="input-area">
+          <div class="input-row">
+            <textarea id="messageInput" placeholder="请输入学生要问的问题，例如：请问您这次为什么来咨询？"></textarea>
+          </div>
+          <div class="button-group">
+            <button class="primary" id="sendBtn">发送</button>
+            <button class="secondary" id="clearBtn">清空输入</button>
+            <button class="secondary" id="copyBtn">复制对话记录</button>
+            <button class="danger" id="endBtn">结束问诊</button>
+          </div>
+          <div class="demo-buttons" aria-label="推荐演示输入">
+            <button class="secondary" type="button" data-demo="opening">开场问诊</button>
+            <button class="secondary" type="button" data-demo="explain">关键解释</button>
+            <button class="secondary" type="button" data-demo="amniocentesis">羊穿说明</button>
+            <button class="secondary" type="button" data-demo="consent">知情同意</button>
+          </div>
+          <p class="muted">按 Enter 发送，按 Shift + Enter 换行。后端不可用时将自动启用本地静态演示模式。</p>
+        </div>
+      </section>
+
+      <!-- 右侧检查栏 -->
+      <aside class="right-panel">
+        <h2>检查与结果</h2>
+
+        <div class="panel">
+          <div class="panel-title">检查模块</div>
+          <div class="tiny">请根据问诊结果选择你认为有必要的检查。课堂演示时可展开下方辅助路径，常规训练时建议先独立判断。</div>
+          <div class="limit-note">本病例最多可选择 3 项检查，请先思考再决定。</div>
+          <details class="demo-guide">
+            <summary><strong>课堂演示辅助：Down病例推荐路径</strong></summary>
+            <div class="pill-row">
+              <span class="pill">报告复核</span>
+              <span class="pill">系统超声</span>
+              <span class="pill">羊水穿刺核型分析</span>
+            </div>
+            <ul class="flow-list">
+              <li>先确认唐筛、NIPT均属于筛查或风险评估。</li>
+              <li>再结合孕周和超声信息，讨论产前诊断。</li>
+              <li>最后通过胎儿染色体核型分析完成诊断闭环。</li>
+            </ul>
+            <div class="button-group" style="margin-top:10px;">
+              <button class="secondary" id="demoTestsBtn" type="button">一键演示推荐检查路径</button>
+            </div>
+          </details>
+          <div class="button-group" style="margin-top:10px;">
+            <button class="secondary" id="reloadTestsBtn">刷新检查列表</button>
+          </div>
+          <div id="testsBox" class="test-list" style="margin-top:10px;">
+            <div class="tiny">尚未加载检查项目。</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">已完成检查</div>
+          <div id="completedTestsBox" class="tiny">暂无已完成检查。</div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">最新检查结果</div>
+          <div id="testResultBox" class="tiny">尚未执行检查。</div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">五维评分反馈</div>
+          <div id="scoringBox" class="tiny">结束问诊后生成评分反馈。</div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script>
+    const COMPETITION_API_BASE_URL = '';
+    const COMPETITION_DEFAULT_MODE = 'ai';
+
+    const MAX_TESTS_PER_CASE = 3;
+
+    const LOCAL_CASE_LIBRARY = {
+      case1: {
+        caseId: 'case1',
+        title: '病例1：婚育前出血家族史咨询',
+        shortTitle: '婚育前出血家族史',
+        identity: '婚育前遗传咨询来访者',
+        patientProfile: { name: '王女士', age: 27, gender: '女', maritalStatus: '已订婚，未孕未育' },
+        opening: '医生您好，我最近准备结婚，家里以前有人有出血方面的问题。我有点担心这会不会遗传，也会不会影响以后生孩子。',
+        chiefConcern: '担心家族中男性亲属反复出血问题是否与遗传有关，并影响后代。',
+        localBrief: '母系亲属有反复出血和关节肿痛史，本人无明显异常出血史；具体病名需通过资料复核和检测确认。',
+        tests: [
+          { testId: 'case1_record', name: '患病亲属既往资料复核', type: 'information', resultTitle: '亲属资料复核', resultText: '资料提示舅舅凝血因子VIII活性明显降低，临床诊断为血友病A。', teachingValue: '先明确家族中具体疾病，再进行携带者风险评估。' },
+          { testId: 'case1_f8', name: '患者凝血相关家系变异针对性检测', type: 'genetic', resultTitle: 'F8基因检测', resultText: '检出与家族疾病一致的F8致病变异，提示患者为血友病A携带者。', teachingValue: '用于确认携带者状态及后续生育风险咨询。' },
+          { testId: 'case1_coagulation', name: '凝血功能及VIII因子活性', type: 'laboratory', resultTitle: '凝血相关检查', resultText: '常规凝血功能基本正常，VIII因子活性处于正常低值范围。', teachingValue: '女性携带者可无明显临床异常，不能单独排除携带状态。' },
+          { testId: 'case1_karyotype', name: '外周血染色体核型分析', type: 'distractor', resultTitle: '染色体核型分析', resultText: '46,XX，未见明显染色体数目或结构异常。', teachingValue: '本病例重点不是染色体病，检查方向价值有限。' }
+        ]
+      },
+      case2: {
+        caseId: 'case2',
+        title: '病例2：夫妻小细胞贫血筛查咨询',
+        shortTitle: '夫妻小细胞贫血筛查',
+        identity: '婚育前遗传咨询来访者',
+        patientProfile: { name: '李女士', age: 26, gender: '女', maritalStatus: '已订婚，未孕未育' },
+        opening: '医生您好，我和对象准备结婚，体检说我红细胞指标有点异常，好像不是普通贫血那么简单。医生建议我们再查清楚，我有点担心以后孩子会不会受影响。',
+        chiefConcern: '夫妻双方小细胞低色素改变的原因及生育风险。',
+        localBrief: '南方地区来访者，小细胞低色素改变，伴侣也有轻度红细胞指标异常；病因需通过血液学和基因检测判断。',
+        tests: [
+          { testId: 'case2_blood', name: '双方血常规及红细胞指数复核', type: 'laboratory', resultTitle: '血液学筛查', resultText: '女方MCV、MCH降低；男方红细胞指数亦偏低，提示需进一步做地贫基因检测。', teachingValue: '血液学筛查可提示携带风险，但不能确定基因型。' },
+          { testId: 'case2_gene', name: '夫妻双方小细胞贫血相关遗传检测', type: 'genetic', resultTitle: '地中海贫血基因检测', resultText: '双方均检出β地中海贫血相关变异，后代存在重型地贫风险。', teachingValue: '夫妻同型或相关携带时需进行生育风险咨询和产前诊断讨论。' },
+          { testId: 'case2_iron', name: '铁代谢指标检测', type: 'laboratory', resultTitle: '铁代谢检查', resultText: '铁蛋白未见明显降低，不支持单纯缺铁性贫血解释全部表现。', teachingValue: '有助于与缺铁性贫血鉴别。' },
+          { testId: 'case2_liver', name: '肝肾功能常规检查', type: 'distractor', resultTitle: '肝肾功能', resultText: '未见明显异常。', teachingValue: '不能回答本次遗传咨询的核心风险。' }
+        ]
+      },
+      case3: {
+        caseId: 'case3',
+        title: '病例3：反复早孕流产咨询',
+        shortTitle: '反复流产',
+        identity: '生育相关遗传咨询来访者',
+        patientProfile: { name: '赵女士', age: 31, gender: '女', maritalStatus: '已婚，既往反复自然流产' },
+        opening: '医生您好，我这几年怀过几次，但都在早孕期流产了。我和爱人都很焦虑，想知道是不是遗传方面有什么问题。',
+        chiefConcern: '反复早孕流产的可能原因及再次妊娠前评估。',
+        localBrief: '既往3次早孕期自然流产，未获得完整胚胎遗传学资料；需通过病史、夫妻核型和流产组织资料逐步判断。',
+        tests: [
+          { testId: 'case3_couple_karyotype', name: '夫妻双方外周血染色体核型分析', type: 'genetic', resultTitle: '夫妻核型分析', resultText: '女方检出平衡易位，男方核型未见明显异常。', teachingValue: '反复流产中应考虑父母平衡易位等染色体结构异常。' },
+          { testId: 'case3_products', name: '流产组织染色体/拷贝数检测', type: 'genetic', resultTitle: '流产组织遗传学检测', resultText: '既往样本不可用；建议后续如再次发生妊娠丢失，尽量保留组织进行检测。', teachingValue: '可帮助区分偶发胚胎异常与父母因素。' },
+          { testId: 'case3_ultrasound', name: '妇科超声及子宫结构评估', type: 'laboratory', resultTitle: '子宫结构评估', resultText: '未见明显子宫畸形。', teachingValue: '反复流产评估需多因素整合。' },
+          { testId: 'case3_blood', name: '常规血液生化检查', type: 'distractor', resultTitle: '常规检查', resultText: '未见特异性异常。', teachingValue: '对遗传学病因判断帮助有限。' }
+        ]
+      },
+      case4: {
+        caseId: 'case4',
+        title: '病例4：产前筛查21三体高风险咨询',
+        shortTitle: '21三体筛查高风险',
+        identity: '孕中期产前遗传咨询来访者',
+        patientProfile: { name: '陈女士', age: 32, gender: '女', maritalStatus: '已婚，孕16-17周' },
+        opening: '医生您好，我现在怀孕大概16到17周，唐氏筛查提示21三体高风险，后来NIPT也说高风险。我特别害怕，这是不是已经确诊了？是不是必须终止妊娠？',
+        chiefConcern: '唐筛和/或NIPT提示21三体高风险后，是否已确诊及下一步处理。',
+        localBrief: '孕16-17周，筛查提示21三体高风险，焦虑，担心是否需要终止妊娠。',
+        tests: [
+          { testId: 'case4_review_reports', name: '复核既往唐氏筛查和NIPT报告', type: 'information', resultTitle: '既往筛查报告复核', resultText: '唐氏筛查提示21三体风险升高；NIPT提示21三体高风险。报告性质为筛查/风险评估结果，均不能替代产前诊断。', teachingValue: '帮助学生明确“筛查不是诊断，高风险不等于确诊”。', interpretationHint: '下一步应结合孕周、超声和知情同意，讨论产前诊断。' },
+          { testId: 'case4_ultrasound', name: '系统超声检查', type: 'laboratory', resultTitle: '系统超声检查', resultText: '胎儿大小与孕周基本相符，未见明确结构畸形。超声未见异常不能排除染色体异常。', teachingValue: '超声可作为综合评估信息，但不能作为21三体最终诊断依据。' },
+          { testId: 'case4_amniocentesis_karyotype', name: '羊水穿刺胎儿染色体核型分析', type: 'genetic', resultTitle: '羊水穿刺胎儿染色体核型分析', resultText: '胎儿核型结果：47,XX,+21，提示21三体。需结合产前诊断流程进行正式报告解读与后续咨询。', teachingValue: '羊水穿刺获得胎儿细胞后进行染色体核型分析，是本病例明确诊断的关键路径。', interpretationHint: '确认诊断后仍需充分告知疾病信息、选择方案、风险和支持资源，尊重孕妇及家庭自主决定。' },
+          { testId: 'case4_couple_karyotype', name: '夫妻双方外周血核型分析', type: 'distractor', resultTitle: '夫妻外周血核型分析', resultText: '夫妻双方外周血核型未见明显异常。该结果不能替代胎儿产前诊断，也不能确认或排除胎儿21三体。', teachingValue: '这是本情境中的干扰项，容易偏离核心诊断路径。' }
+        ]
+      },
+      case5: {
+        caseId: 'case5',
+        title: '病例5：原发闭经与身材矮小咨询',
+        shortTitle: '原发闭经与身材矮小',
+        identity: '青春期/生育相关遗传咨询来访者',
+        patientProfile: { name: '周女士', age: 18, gender: '女', maritalStatus: '未婚，原发闭经咨询' },
+        opening: '医生您好，我一直没有正常来月经，身高也比同龄人矮一些。之前医生说可能需要查染色体，我想弄清楚到底是什么原因。',
+        chiefConcern: '原发闭经、身材矮小的原因及后续健康管理。',
+        localBrief: '原发闭经、身材矮小，伴青春期发育不充分线索；具体诊断需通过核型和系统评估确认。',
+        tests: [
+          { testId: 'case5_karyotype', name: '外周血染色体核型分析', type: 'genetic', resultTitle: '染色体核型分析', resultText: '45,X/46,XX嵌合，支持Turner综合征相关诊断。', teachingValue: '性染色体核型是诊断Turner综合征的重要依据。' },
+          { testId: 'case5_ultrasound', name: '盆腔超声', type: 'laboratory', resultTitle: '盆腔超声', resultText: '子宫偏小，双侧卵巢显示不清。', teachingValue: '用于评估性腺发育及生殖系统情况。' },
+          { testId: 'case5_heart', name: '心脏及肾脏结构评估', type: 'laboratory', resultTitle: '并发症筛查', resultText: '建议进一步评估心血管和肾脏结构风险。', teachingValue: 'Turner综合征咨询应包含系统健康管理。' },
+          { testId: 'case5_metabolic', name: '常规代谢指标', type: 'distractor', resultTitle: '代谢指标', resultText: '未见特异性异常。', teachingValue: '不能替代染色体诊断。' }
+        ]
+      },
+      case6: {
+        caseId: 'case6',
+        title: '病例6：成人发病神经系统家族史咨询',
+        shortTitle: '成人发病神经系统家族史',
+        identity: '成人发病遗传病风险咨询来访者',
+        patientProfile: { name: '刘先生', age: 29, gender: '男', maritalStatus: '未婚，考虑结婚生育' },
+        opening: '医生您好，我父亲最近被诊断出一种会影响动作和认知的遗传相关疾病。我现在没有症状，但很担心自己以后会不会发病，也担心将来孩子。',
+        chiefConcern: '父亲成人发病神经系统疾病后，本人是否需要预测性检测及生育风险咨询。',
+        localBrief: '父亲有成人发病的运动、认知和精神行为改变，家属携带外院资料但开场不直接给出病名；需先复核资料再讨论预测性检测伦理。',
+        tests: [
+          { testId: 'case6_father_record', name: '父亲外院神经系统疾病资料复核', type: 'information', resultTitle: '父亲资料复核', resultText: '父亲病历记录运动异常、认知和行为改变；遗传检测提示HTT基因CAG重复扩增，符合Huntington病诊断。', teachingValue: '预测性检测前应先确认家系中的具体诊断和致病变异。' },
+          { testId: 'case6_predictive', name: '本人家系相关变异预测性检测评估', type: 'genetic', resultTitle: '预测性检测评估', resultText: '该检测对应家系中已确认的HTT基因CAG重复扩增，但需在充分遗传咨询、心理评估和知情同意后进行，不宜仓促安排。', teachingValue: '成人发病且目前无症状疾病的预测性检测具有重要伦理要求。' },
+          { testId: 'case6_psych', name: '心理状态评估', type: 'laboratory', resultTitle: '心理评估', resultText: '来访者焦虑明显，建议检测决策前进行心理支持。', teachingValue: '预测性检测不只是技术问题，也涉及心理承受和自主选择。' },
+          { testId: 'case6_ct', name: '头颅影像学筛查', type: 'distractor', resultTitle: '影像学筛查', resultText: '目前未见特异性改变。', teachingValue: '无症状阶段不应用其替代遗传咨询和检测决策。' }
+        ]
+      },
+      case7: {
+        caseId: 'case7',
+        title: '病例7：子代先天性唇腭部畸形再生育咨询',
+        shortTitle: '子代唇腭部畸形再生育',
+        identity: '再生育风险咨询来访者',
+        patientProfile: { name: '孙女士', age: 30, gender: '女', maritalStatus: '已婚，既往一胎唇腭裂' },
+        opening: '医生您好，我第一个孩子出生后发现唇腭裂。我们还想再要一个孩子，但很担心下一胎还会不会这样。',
+        chiefConcern: '既往子代唇腭裂后的再发风险和孕前/孕期管理。',
+        localBrief: '既往一胎非综合征性唇腭裂，关注多因素再发风险。',
+        tests: [
+          { testId: 'case7_child_record', name: '患儿病历和表型资料复核', type: 'information', resultTitle: '患儿资料复核', resultText: '患儿表现以唇腭裂为主，暂无明确综合征性线索。', teachingValue: '先区分综合征性和非综合征性唇腭裂。' },
+          { testId: 'case7_ultrasound', name: '孕期目标超声评估', type: 'laboratory', resultTitle: '目标超声', resultText: '可在合适孕周重点观察颜面结构。', teachingValue: '孕期超声可帮助发现部分结构异常。' },
+          { testId: 'case7_panel', name: '必要时遗传检测评估', type: 'genetic', resultTitle: '遗传检测评估', resultText: '若伴随其他畸形或发育异常，可考虑进一步检测；单纯病例需说明检测局限。', teachingValue: '多因素疾病咨询应避免过度承诺。' },
+          { testId: 'case7_blood', name: '父母血常规', type: 'distractor', resultTitle: '血常规', resultText: '未见特异性异常。', teachingValue: '对再发风险评估帮助有限。' }
+        ]
+      },
+      case8: {
+        caseId: 'case8',
+        title: '病例8：青年视力下降家族风险咨询',
+        shortTitle: '青年视力下降家族风险',
+        identity: '视力下降家族风险咨询来访者',
+        patientProfile: { name: '吴先生', age: 24, gender: '男', maritalStatus: '未婚' },
+        opening: '医生您好，我最近视力下降，眼科医生说可能和视神经以及遗传因素有关。我想知道这到底是什么问题，会不会影响家里人和以后孩子。',
+        chiefConcern: '青年视力下降的遗传学诊断确认、家族风险和生育咨询。',
+        localBrief: '青年男性视力下降，眼科提示视神经受累；诊断和遗传方式需结合眼科资料、母系家族史和线粒体DNA检测。',
+        tests: [
+          { testId: 'case8_mtdna', name: '线粒体DNA视神经病相关变异检测', type: 'genetic', resultTitle: '线粒体DNA检测', resultText: '检出LHON相关常见致病变异，支持Leber遗传性视神经病变诊断。', teachingValue: 'LHON通常涉及线粒体DNA变异和母系遗传。' },
+          { testId: 'case8_eye', name: '眼科专科评估', type: 'laboratory', resultTitle: '眼科评估', resultText: '视神经受累表现与LHON相符。', teachingValue: '临床表型与遗传检测需综合判断。' },
+          { testId: 'case8_maternal', name: '母系亲属风险资料收集', type: 'information', resultTitle: '母系家系评估', resultText: '母系家族有视力下降线索，建议母系亲属进行咨询。', teachingValue: '线粒体遗传重点关注母系传递。' },
+          { testId: 'case8_karyotype', name: '外周血染色体核型分析', type: 'distractor', resultTitle: '染色体核型', resultText: '未见明显异常。', teachingValue: '不能解释典型LHON线索。' }
+        ]
+      },
+      case9: {
+        caseId: 'case9',
+        title: '病例9：男性不育与染色体异常咨询',
+        shortTitle: '男性不育与染色体异常',
+        identity: '男性不育遗传咨询来访者',
+        patientProfile: { name: '郑先生', age: 30, gender: '男', maritalStatus: '已婚，婚后不育' },
+        opening: '医生您好，我结婚后一直没有孩子，前面检查说精液结果不太好，医生建议我再查染色体。我想知道这可能是什么原因，还能不能有自己的孩子。',
+        chiefConcern: '男性不育、精液异常和可能染色体因素的诊断及生育咨询。',
+        localBrief: '婚后不育，精液异常，尚未在开场给出具体染色体诊断；需通过精液、激素和核型检查逐步判断。',
+        tests: [
+          { testId: 'case9_karyotype', name: '外周血染色体核型分析', type: 'genetic', resultTitle: '染色体核型分析', resultText: '47,XXY，支持Klinefelter综合征诊断。', teachingValue: '核型分析是明确诊断的关键检查。' },
+          { testId: 'case9_semen', name: '精液分析复核', type: 'laboratory', resultTitle: '精液分析', resultText: '严重少弱精或无精子表现。', teachingValue: '解释不育表现并指导生殖医学转诊。' },
+          { testId: 'case9_hormone', name: '性激素水平检测', type: 'laboratory', resultTitle: '性激素检测', resultText: '促性腺激素升高，睾酮偏低。', teachingValue: '辅助评估性腺功能。' },
+          { testId: 'case9_partner', name: '配偶常规妇科检查', type: 'distractor', resultTitle: '配偶常规检查', resultText: '未见明显异常。', teachingValue: '不能替代男方染色体诊断。' }
+        ]
+      }
+    };
+
+    const LOCAL_DEMO_INPUTS = {
+      opening: '您好，我先了解一下情况。您现在孕周大约是多少？这次筛查报告具体写的是唐氏筛查高风险、NIPT高风险，还是两项都有？您现在最担心的问题是什么？',
+      explain: '我理解您看到“高风险”会非常紧张。需要先说明，唐氏筛查是筛查，不是诊断；高风险不等于已经确诊。NIPT比传统筛查更准确，但本质上仍然是风险评估，不能作为最终诊断依据。',
+      amniocentesis: '下一步建议进行遗传咨询并讨论产前诊断。以您目前孕16到17周的情况，通常可以考虑羊水穿刺，获取胎儿细胞后做染色体核型分析或相应遗传学检测，用来明确胎儿是否存在21三体。',
+      consent: '是否做羊水穿刺、如何面对后续结果，都需要在充分了解收益、风险、局限和替代方案后由您和家属自主决定。我们不会因为筛查高风险就直接建议终止妊娠，而是先把诊断和选择讲清楚，陪您一步一步判断。'
+    };
+
+    const LOCAL_MATERIAL_LIBRARY = {
+      case1: [
+        {
+          materialId: 'local_case1_relative_record',
+          title: '患病亲属既往病历资料',
+          description: '患者补充提交了家族中患病亲属的既往病历资料。',
+          linkedTestIds: ['case1_record', 'test_uncle_record'],
+          detail: [
+            '材料名称：患病亲属既往病历资料',
+            '资料来源：患者母系亲属既往就诊记录复印件',
+            '关键信息：患者舅舅自幼反复出血，凝血因子VIII活性明显降低，临床诊断为血友病A。',
+            '补充信息：舅舅之子也有类似出血表现。',
+            '教学提示：该资料用于确认家系中的具体疾病名称，后续仍需评估患者本人是否为携带者。'
+          ]
+        }
+      ],
+      case2: [
+        {
+          materialId: 'local_case2_premarital_cbc',
+          title: '夫妻婚前体检血常规资料',
+          description: '患者提交了双方婚前体检中的血常规和红细胞指数资料。',
+          linkedTestIds: ['case2_blood', 'test_both_cbc'],
+          detail: [
+            '材料名称：夫妻婚前体检血常规资料',
+            '女方：MCV、MCH降低，血红蛋白轻度降低。',
+            '男方：红细胞指数轻度异常，MCV、MCH偏低。',
+            '既往处理：女方曾补铁，改善不明显。',
+            '教学提示：既往资料提示小细胞低色素改变，不能直接等同于缺铁，应进一步考虑地中海贫血相关检测。'
+          ]
+        }
+      ],
+      case3: [
+        {
+          materialId: 'local_case3_karyotype_report',
+          title: '夫妻双方外周血核型分析报告',
+          description: '患者提交了外院已完成的夫妻双方外周血核型分析报告。',
+          linkedTestIds: ['case3_couple_karyotype', 'test_couple_karyotype'],
+          detail: [
+            '材料名称：夫妻双方外周血核型分析报告',
+            '送检项目：夫妻双方外周血染色体核型分析',
+            '女方结果：46,XX。',
+            '男方结果：46,XY,t(11;22)(q23;q11)。',
+            '结果提示：男方为平衡易位携带者，本人可无明显异常，但生殖过程中可增加胚胎染色体不平衡和自然流产风险。',
+            '教学提示：该材料属于既往外院资料，学生应主动查看并结合反复流产病史进行解释。'
+          ]
+        }
+      ],
+      case4: [
+        {
+          materialId: 'local_case4_screening_reports',
+          title: '既往唐氏筛查与NIPT报告',
+          description: '患者提交了既往产前筛查和NIPT报告。',
+          linkedTestIds: ['case4_review_reports', 'test_case4_screening_report'],
+          detail: [
+            '材料名称：既往唐氏筛查与NIPT报告',
+            '孕周：约16-17周。',
+            '唐氏筛查：21三体风险升高。',
+            'NIPT：21三体高风险。',
+            '报告性质：以上均为筛查或风险评估结果，不能替代产前诊断。',
+            '教学提示：应向患者说明“筛查不是诊断，高风险不等于确诊，NIPT仍不是最终诊断”。'
+          ]
+        }
+      ],
+      case6: [
+        {
+          materialId: 'local_case6_father_record',
+          title: '父亲外院神经系统疾病资料',
+          description: '患者提交了父亲外院诊断资料和遗传检测报告摘要。',
+          linkedTestIds: ['case6_father_record', 'test_case6_father_record'],
+          detail: [
+            '材料名称：父亲外院神经系统疾病资料',
+            '临床表现：中年后逐渐出现不自主运动、认知下降和行为改变。',
+            '遗传检测：HTT基因CAG重复扩增。',
+            '诊断结论：符合Huntington病诊断。',
+            '教学提示：确认家系先证者诊断后，才能讨论无症状亲属预测性检测；检测前需心理评估和知情同意。'
+          ]
+        }
+      ],
+      case7: [
+        {
+          materialId: 'local_case7_child_record',
+          title: '一胎患儿病历与手术记录',
+          description: '患者提交了第一胎孩子的出生记录和修复手术资料。',
+          linkedTestIds: ['case7_child_record', 'test_case7_child_record'],
+          detail: [
+            '材料名称：一胎患儿病历与手术记录',
+            '主要表现：出生后发现唇裂合并腭裂，后续接受修复手术。',
+            '目前资料：未记录明确心脏、四肢、智力发育等综合征性异常线索。',
+            '教学提示：应先判断是否存在综合征性线索，再讨论多因素再发风险、孕前管理和孕期目标超声。'
+          ]
+        }
+      ],
+      case8: [
+        {
+          materialId: 'local_case8_eye_record',
+          title: '眼科专科检查资料',
+          description: '患者提交了近期眼科专科检查资料。',
+          linkedTestIds: ['case8_eye', 'test_case8_eye_record'],
+          detail: [
+            '材料名称：眼科专科检查资料',
+            '主诉：近期中心视力下降。',
+            '眼科提示：视神经受累表现，建议结合遗传因素进一步评估。',
+            '家族线索：母系亲属中有年轻时视力明显下降者。',
+            '教学提示：该资料提示需考虑线粒体DNA相关视神经病，并追问母系家族史。'
+          ]
+        }
+      ],
+      case9: [
+        {
+          materialId: 'local_case9_semen_report',
+          title: '既往精液检查报告',
+          description: '患者提交了既往男科精液检查报告。',
+          linkedTestIds: ['case9_semen', 'test_case9_semen_analysis'],
+          detail: [
+            '材料名称：既往精液检查报告',
+            '结果摘要：严重少精/无精表现，提示明显男性生育障碍。',
+            '外院建议：进一步评估性激素水平和染色体核型。',
+            '教学提示：既往精液检查已完成，检查列表中不应重复开具；下一步应结合内分泌和遗传学检查。'
+          ]
+        }
+      ]
+    };
+
+    let cases = {};
+    let currentTests = [];
+    let completedTests = [];
+    let currentTestResult = null;
+
+    const caseSelect = document.getElementById('caseSelect');
+    const caseBasicInfo = document.getElementById('caseBasicInfo');
+    const startBtn = document.getElementById('startBtn');
+    const sendBtn = document.getElementById('sendBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const endBtn = document.getElementById('endBtn');
+    const reloadTestsBtn = document.getElementById('reloadTestsBtn');
+    const demoTestsBtn = document.getElementById('demoTestsBtn');
+
+    const messageInput = document.getElementById('messageInput');
+    const chatBox = document.getElementById('chatBox');
+    const groupName = document.getElementById('groupName');
+    const apiEndpoint = document.getElementById('apiEndpoint');
+    const statusBox = document.getElementById('statusBox');
+    const modeSelect = document.getElementById('modeSelect');
+    const currentModeBox = document.getElementById('currentModeBox');
+
+    const testsBox = document.getElementById('testsBox');
+    const completedTestsBox = document.getElementById('completedTestsBox');
+    const testResultBox = document.getElementById('testResultBox');
+    const scoringBox = document.getElementById('scoringBox');
+
+    function getCompetitionApiBaseUrl() {
+      const params = new URLSearchParams(window.location.search || '');
+      const apiFromQuery = params.get('api') || params.get('apiBase') || params.get('backend');
+      const configuredBase = (apiFromQuery || COMPETITION_API_BASE_URL || window.COMPETITION_API_BASE_URL || '').trim();
+      const sameOriginBase = window.location.protocol && window.location.protocol.indexOf('http') === 0
+        ? window.location.origin
+        : '';
+      const base = configuredBase || sameOriginBase;
+      return base.replace(/\/api\/chat\/?$/, '').replace(/\/$/, '');
+    }
+
+    function initializeCompetitionEndpoint() {
+      const apiBase = getCompetitionApiBaseUrl();
+      if (apiBase) {
+        apiEndpoint.value = `${apiBase}/api/chat`;
+      }
+      modeSelect.value = COMPETITION_DEFAULT_MODE;
+    }
+
+    let started = false;
+    let consultationEnded = false;
+    let conversationHistory = [];
+    let isLoading = false;
+    let isTestRunning = false;
+    let localModeActive = false;
+    let lastLocalReply = '';
+    let dialogueState = {};
+    let surfacedMaterialIds = [];
+    let viewedMaterialIds = [];
+
+    function createDialogueState() {
+      return {
+        explainedScreeningNotDiagnosis: false,
+        explainedHighRiskNotConfirmed: false,
+        explainedNiptNotDiagnosis: false,
+        mentionedAmniocentesis: false,
+        mentionedKaryotype: false,
+        mentionedPrenatalDiagnosis: false,
+        addressedAnxiety: false,
+        mentionedConsent: false,
+        respectedAutonomy: false,
+        avoidedDirectTermination: true,
+        shortAdvanceCount: 0
+      };
+    }
+
+    dialogueState = createDialogueState();
+
+    function getBaseApiUrl(chatUrl) {
+      return chatUrl.trim().replace(/\/api\/chat\/?$/, '');
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    async function safeReadJson(response) {
+      const text = await response.text();
+
+      if (!text) {
+        return {};
+      }
+
+      try {
+        return JSON.parse(text);
+      } catch (error) {
+        throw new Error(`接口返回的不是有效 JSON（HTTP ${response.status}）。`);
+      }
+    }
+
+    function localCaseList() {
+      return Object.values(LOCAL_CASE_LIBRARY).map(item => ({
+        caseId: item.caseId,
+        title: item.title,
+        shortTitle: item.shortTitle,
+        opening: item.opening,
+        chiefConcern: item.chiefConcern,
+        identity: item.identity,
+        patientProfile: item.patientProfile
+      }));
+    }
+
+    function activateLocalMode(reason = '') {
+      localModeActive = true;
+      cases = {};
+      fillCaseSelect(localCaseList());
+      updateCaseBasicInfo();
+      currentModeBox.value = '当前返回模式：前端本地静态演示';
+      statusBox.value = reason
+        ? `已启用前端本地静态演示模式：${reason}`
+        : '已启用前端本地静态演示模式。';
+    }
+
+    function getLocalCase(caseId) {
+      return LOCAL_CASE_LIBRARY[caseId] || LOCAL_CASE_LIBRARY.case4;
+    }
+
+    function getLocalTests(caseId) {
+      return (getLocalCase(caseId).tests || []).map(item => ({
+        ...item,
+        available: true,
+        allowRepeat: false,
+        prerequisites: item.prerequisites || []
+      }));
+    }
+
+    function getLocalMaterials(caseId) {
+      return LOCAL_MATERIAL_LIBRARY[caseId] || [];
+    }
+
+    function getLocalMaterialById(caseId, materialId) {
+      return getLocalMaterials(caseId).find(item => item.materialId === materialId) || null;
+    }
+
+    function getPriorMaterialTestIds(caseId) {
+      return getLocalMaterials(caseId).flatMap(item => item.linkedTestIds || []);
+    }
+
+    function isAskingForPriorReports(text) {
+      const q = normalizeText(text);
+      return includesAny(q, [
+        '以前的检查',
+        '之前的检查',
+        '既往检查',
+        '检查报告',
+        '报告',
+        '病历',
+        '病例资料',
+        '外院资料',
+        '外院报告',
+        '带来了吗',
+        '带了吗',
+        '给我看看',
+        '调取',
+        '复核'
+      ]);
+    }
+
+    function getTriggeredLocalMaterial(caseId, text) {
+      if (!isAskingForPriorReports(text)) return null;
+      return getLocalMaterials(caseId).find(item => !surfacedMaterialIds.includes(item.materialId)) || null;
+    }
+
+    function appendLocalMaterialCard(material) {
+      if (!material || surfacedMaterialIds.includes(material.materialId)) return;
+      surfacedMaterialIds.push(material.materialId);
+      appendMessage('material-card', material.description || '患者提交了既往检查材料。', {
+        title: material.title || '既往检查材料',
+        actionText: '查看报告',
+        materialId: material.materialId
+      });
+    }
+
+    function maybeShowLocalMaterialCard(caseId, text) {
+      const material = getTriggeredLocalMaterial(caseId, text);
+      if (material) {
+        appendLocalMaterialCard(material);
+      }
+    }
+
+    function normalizeText(text) {
+      return String(text || '').toLowerCase().replace(/\s+/g, '');
+    }
+
+    function includesAny(text, words) {
+      return words.some(word => text.includes(word.toLowerCase()));
+    }
+
+    function updateDialogueStateFromStudent(text) {
+      const q = normalizeText(text);
+      if (includesAny(q, ['筛查不是诊断', '筛查不等于诊断', '筛查不能确诊', '不是诊断'])) {
+        dialogueState.explainedScreeningNotDiagnosis = true;
+      }
+      if (includesAny(q, ['高风险不等于确诊', '高风险不是确诊', '不代表确诊', '不能说明已经确诊'])) {
+        dialogueState.explainedHighRiskNotConfirmed = true;
+      }
+      if (includesAny(q, ['nipt不是诊断', 'nipt仍然是筛查', 'nipt属于风险评估', 'nipt不能确诊', '无创不是诊断'])) {
+        dialogueState.explainedNiptNotDiagnosis = true;
+      }
+      if ((q.includes('nipt') || q.includes('无创')) && (q.includes('风险评估') || q.includes('不能确诊') || q.includes('不是最终诊断'))) {
+        dialogueState.explainedNiptNotDiagnosis = true;
+      }
+      if (includesAny(q, ['羊水穿刺', '羊穿'])) {
+        dialogueState.mentionedAmniocentesis = true;
+      }
+      if (includesAny(q, ['核型分析', '染色体核型', '胎儿染色体'])) {
+        dialogueState.mentionedKaryotype = true;
+      }
+      if (includesAny(q, ['产前诊断', '进一步诊断'])) {
+        dialogueState.mentionedPrenatalDiagnosis = true;
+      }
+      if (includesAny(q, ['焦虑', '紧张', '害怕', '担心', '理解您', '我理解', '先别急', '陪您'])) {
+        dialogueState.addressedAnxiety = true;
+      }
+      if (includesAny(q, ['知情同意', '充分了解', '收益风险', '风险和局限', '替代方案'])) {
+        dialogueState.mentionedConsent = true;
+      }
+      if (includesAny(q, ['自主选择', '由您决定', '尊重', '自己决定', '共同决定'])) {
+        dialogueState.respectedAutonomy = true;
+      }
+      if (includesAny(q, ['必须终止', '立刻终止', '建议终止妊娠', '直接终止'])) {
+        dialogueState.avoidedDirectTermination = false;
+      }
+    }
+
+    function pickLocalReply(candidates) {
+      const filtered = candidates.filter(item => item !== lastLocalReply);
+      const pool = filtered.length ? filtered : candidates;
+      const reply = pool[Math.floor(Math.random() * pool.length)];
+      lastLocalReply = reply;
+      return reply;
+    }
+
+    function getLocalProfileReply(caseData, q) {
+      const profile = caseData.patientProfile || {};
+      if (includesAny(q, ['多大', '几岁', '年龄', '年纪', '岁数'])) {
+        return `我今年${profile.age || '不太确定具体'}岁。`;
+      }
+      if (includesAny(q, ['叫什么', '姓名', '名字'])) {
+        return profile.name ? `我叫${profile.name}。` : '您叫我患者就可以。';
+      }
+      if (includesAny(q, ['男', '女', '性别'])) {
+        return profile.gender ? `我是${profile.gender}性。` : '这个基本信息您可以按病例资料记录。';
+      }
+      if (includesAny(q, ['结婚', '婚育', '对象', '配偶', '怀孕了吗', '生过孩子'])) {
+        return profile.maritalStatus
+          ? `我目前的婚育情况是：${profile.maritalStatus}。`
+          : '这方面我也想请您结合这次咨询帮我一起判断。';
+      }
+      if (includesAny(q, ['职业', '工作', '做什么'])) {
+        return profile.occupation ? `我的工作是${profile.occupation}。` : '我目前没有特别需要说明的职业暴露。';
+      }
+      if (includesAny(q, ['听不懂', '换个说法', '会说别的吗', '别重复', '你没回答'])) {
+        return '抱歉，我刚才可能没说清楚。您可以直接问我年龄、家族里谁有问题、以前做过什么检查，或者我最担心什么，我会尽量按您问的回答。';
+      }
+      return '';
+    }
+
+    function getLocalChiefConcernReply(caseData) {
+      const replies = {
+        case1: '我最近准备结婚，最担心家里出血方面的问题会不会遗传，以后会不会影响孩子。',
+        case2: '我们婚前体检发现红细胞指标异常，最担心是不是地中海贫血相关问题，以及以后孩子会不会受影响。',
+        case3: '我们反复早孕流产，最想知道是不是遗传或染色体方面有什么原因，下一次怀孕前该怎么评估。',
+        case4: '我现在怀孕16到17周，唐筛和无创都提示21三体高风险，最担心这是不是已经确诊，以及下一步该怎么办。',
+        case5: '我一直没有正常来月经，身高也比较矮，想弄清楚是什么原因，以后健康和生育会不会受影响。',
+        case6: '我父亲有成人发病的神经系统问题，医生说可能和遗传有关。我担心自己以后会不会发病，也担心未来孩子。',
+        case7: '第一个孩子出生后有唇腭裂，我们想再要孩子，最担心下一胎会不会再次发生。',
+        case8: '我最近视力下降，眼科医生说可能和视神经及遗传因素有关，我担心家里人和以后孩子会不会受影响。',
+        case9: '我结婚后一直没有孩子，精液检查结果不好，想知道可能是什么原因，还有没有机会有自己的孩子。'
+      };
+      return replies[caseData.caseId] || `我主要担心${caseData.chiefConcern || '这个问题'}，想请您帮我把风险和下一步讲清楚。`;
+    }
+
+    function generateLocalPatientReply(caseData, studentText) {
+      updateDialogueStateFromStudent(studentText);
+      const q = normalizeText(studentText);
+      const isShortAdvance = /^(是|是的|对|好的|好|可以|嗯|行|做羊穿|羊穿|明白|知道了)[。！!？?]*$/.test(q);
+      if (isShortAdvance) {
+        dialogueState.shortAdvanceCount += 1;
+      }
+
+      const profileReply = getLocalProfileReply(caseData, q);
+      if (profileReply) {
+        lastLocalReply = profileReply;
+        return profileReply;
+      }
+
+      if (getTriggeredLocalMaterial(caseData.caseId, studentText)) {
+        return '我带了之前的检查报告和病历资料，但里面很多专业内容我看不懂。您可以先看看报告，再帮我解释一下这对现在的判断有什么意义吗？';
+      }
+
+      if (caseData.caseId === 'case5' && isAskingForPriorReports(studentText)) {
+        return '我这次没有带正式报告，只记得前面外院做过初步评估，说可能和发育或染色体有关，建议我进一步查。还没有最终诊断，我也不太懂该先查什么。';
+      }
+
+      if (caseData.caseId === 'case4') {
+        if (includesAny(q, ['终止妊娠', '不要这个孩子', '引产', '必须终止'])) {
+          return pickLocalReply([
+            '我最害怕的就是这个问题，所以刚才一看到高风险就慌了。听您这么说，我理解现在还不能只凭筛查就做决定，还是要先把诊断弄清楚。',
+            '我不是想马上做决定，就是太害怕了。您能先帮我确认一下，下一步是不是应该做能确诊的检查？'
+          ]);
+        }
+        if (dialogueState.explainedScreeningNotDiagnosis && dialogueState.explainedHighRiskNotConfirmed && !dialogueState.mentionedAmniocentesis) {
+          return pickLocalReply([
+            '那我稍微放心一点，原来高风险还不是已经确诊。可是我还是想知道，接下来有没有办法把结果弄得更明确？',
+            '也就是说现在只是提示风险高，还不能说宝宝一定有问题，对吗？那下一步我应该做什么检查？'
+          ]);
+        }
+        if (dialogueState.mentionedAmniocentesis && dialogueState.mentionedKaryotype) {
+          return pickLocalReply([
+            '羊水穿刺听起来能更明确，但我也有点担心风险。您能不能再跟我说说，这个检查主要能确认什么、需要我注意什么？',
+            '如果羊穿和染色体核型能确诊，那我愿意认真考虑。只是我现在还是紧张，想知道是不是可以先和家里人商量一下。'
+          ]);
+        }
+        if (dialogueState.mentionedConsent || dialogueState.respectedAutonomy) {
+          return pickLocalReply([
+            '谢谢您这样说，我感觉没那么被逼着马上做决定了。我们希望先把信息了解清楚，再和家里人一起慎重决定。',
+            '我能接受先进一步诊断，再根据正式结果和医生解释来选择。您刚才说的风险和选择，我想回去也跟家里人讲清楚。'
+          ]);
+        }
+        if (dialogueState.addressedAnxiety) {
+          return pickLocalReply([
+            '谢谢您理解我，我这两天确实睡不太好。只要现在还不是确诊，我想一步一步把该做的检查弄清楚。',
+            '我现在最需要的就是有人帮我把这些报告讲明白。您继续说，我会配合。'
+          ]);
+        }
+        if (isShortAdvance) {
+          return pickLocalReply([
+            '好的，那我明白一点了。您接着帮我说说，哪些结果是筛查，哪些才算真正诊断？',
+            '可以，我愿意继续了解。就是希望您说得直白一点，我现在脑子有点乱。'
+          ]);
+        }
+        return pickLocalReply([
+          '医生，我现在最怕的是“高风险”是不是就等于宝宝已经有问题。您能不能直接告诉我，这到底算不算确诊？',
+          '我看报告上写得很吓人，家里人也都很着急。可我又不敢只根据这个就做决定，所以想听您怎么判断。',
+          '我愿意配合检查，但现在真的很焦虑。您能一步一步告诉我，接下来最关键的是什么吗？'
+        ]);
+      }
+
+      if (caseData.caseId === 'case1') {
+        if (includesAny(q, ['谁', '家族', '亲属', '亲戚', '哪边', '爸爸', '妈妈', '舅舅'])) {
+          return '主要是我妈妈这边的亲戚。印象里是我舅舅从小就容易出血，磕碰以后不太容易止住，后来他的儿子好像也有类似情况。';
+        }
+        if (includesAny(q, ['出血', '关节', '症状', '表现'])) {
+          return '他们会有反复出血，家里人还说过关节肿痛。具体病名我说不准，资料可能需要再复核。';
+        }
+        if (includesAny(q, ['本人', '你自己', '月经', '拔牙', '流鼻血'])) {
+          return '我自己平时没有特别明显的出血问题，月经量也没有夸张到影响生活。正因为我自己没症状，所以才不知道会不会还和遗传有关。';
+        }
+        if (includesAny(q, ['孩子', '生育', '结婚', '风险'])) {
+          return '我最担心的是以后孩子会不会受影响。我们快结婚了，我希望在怀孕前先把风险弄明白。';
+        }
+      }
+
+      if (caseData.caseId === 'case2') {
+        if (includesAny(q, ['体检', '贫血', '血常规', '红细胞', 'mcv', 'mch'])) {
+          return '体检说我红细胞偏小，血红蛋白只是轻度低一点。以前也有人说我贫血，但吃铁剂好像改善不明显。';
+        }
+        if (includesAny(q, ['对象', '丈夫', '男方', '配偶'])) {
+          return '我对象体检也有一点红细胞指标异常，但他平时没有明显不舒服。医生说如果两个人都有类似问题，就需要一起评估。';
+        }
+        if (includesAny(q, ['籍贯', '地区', '南方', '家族'])) {
+          return '我和对象家里都在南方，家里老人有人长期被说“有点贫血”，但没有谁明确说过是什么病。';
+        }
+        if (includesAny(q, ['孩子', '生育', '怀孕', '风险'])) {
+          return '我们最担心的是以后孩子会不会出现严重贫血。现在还没怀孕，所以想先把这个问题查清楚。';
+        }
+      }
+
+      if (caseData.caseId === 'case3') {
+        if (includesAny(q, ['几次', '流产', '孕周', '什么时候'])) {
+          return '一共大概三次，基本都在怀孕早期，差不多七到十周左右就停育或自然流掉了。每次都挺突然，对我们打击很大。';
+        }
+        if (includesAny(q, ['胚胎', '绒毛', '流产组织', '病理'])) {
+          return '以前没有系统做过胚胎或流产组织的遗传学检查，有一次组织也没有保存下来。现在回头看，我们也觉得资料太少。';
+        }
+        if (includesAny(q, ['夫妻', '丈夫', '家族', '染色体'])) {
+          return '我们夫妻平时身体都还可以，家族里没有特别明确的遗传病史。以前医生提过可以查夫妻双方染色体，但我们还没完整做过。';
+        }
+        if (includesAny(q, ['感染', '免疫', '内分泌', '子宫', '原因'])) {
+          return '有些常规妇科检查做过，但我记不太清楚具体项目。我们这次就是想把可能原因系统梳理一遍，不想只是反复碰运气。';
+        }
+      }
+
+      if (caseData.caseId === 'case5') {
+        if (includesAny(q, ['月经', '闭经', '初潮'])) {
+          return '我一直没有真正规律来过月经，同龄人都来了以后我就越来越担心。以前只是觉得自己发育慢，后来才想到可能需要检查。';
+        }
+        if (includesAny(q, ['身高', '发育', '乳房', '青春期'])) {
+          return '我身高大概一米四几，从小就比同学矮。青春期发育也比较慢，这些问题以前没有放在一起看。';
+        }
+        if (includesAny(q, ['心脏', '肾', '听力', '其他'])) {
+          return '目前没有特别明显的不舒服，但医生说如果真和染色体有关，可能还要系统看看心脏、肾脏这些情况。';
+        }
+        if (includesAny(q, ['生育', '孩子', '以后'])) {
+          return '我也担心以后能不能正常生育。现在最想先知道到底是什么原因，再考虑后面怎么管理。';
+        }
+      }
+
+      if (caseData.caseId === 'case6') {
+        if (includesAny(q, ['父亲', '爸爸', '谁', '家族'])) {
+          return '是我父亲先出的问题。他这几年动作有点控制不住，性格和记忆也变了，后来医院说可能是遗传相关的神经系统疾病。';
+        }
+        if (includesAny(q, ['年龄', '什么时候', '发病'])) {
+          return '我父亲是中年以后慢慢出现症状的，不是年轻时就发病。具体最早哪一年开始，我现在也说不特别准。';
+        }
+        if (includesAny(q, ['本人', '你自己', '你有没有', '症状'])) {
+          return '我自己现在没有明显症状，工作生活都正常。但正因为现在看不出来，我才更纠结到底要不要提前知道。';
+        }
+        if (includesAny(q, ['检测', '预测', '知情', '心理'])) {
+          return '我想知道能不能查，但也害怕查出来以后心理承受不了。您能不能先告诉我，这种没症状的人检测前一般要考虑什么？';
+        }
+        if (includesAny(q, ['孩子', '生育', '结婚', '风险'])) {
+          return '我还没结婚，但已经在考虑以后生育的问题。如果我自己有风险，我也担心会不会影响下一代。';
+        }
+      }
+
+      if (caseData.caseId === 'case7') {
+        if (includesAny(q, ['孩子', '第一胎', '表现', '畸形'])) {
+          return '第一个孩子出生后发现唇部和上腭都有裂开，后来做过修复手术。其他方面目前看起来还可以，没有明确说还有别的综合问题。';
+        }
+        if (includesAny(q, ['家族', '亲属', '类似'])) {
+          return '双方家族里没有特别明确的类似情况，至少我们知道的近亲里没有。就是因为第一胎突然出现，我们很担心再发生。';
+        }
+        if (includesAny(q, ['孕期', '用药', '叶酸', '环境'])) {
+          return '上一次怀孕早期我没有特别规范补充叶酸，也不记得有明显接触有害物。现在想再怀孕，就想把能注意的都提前做好。';
+        }
+        if (includesAny(q, ['再发', '风险', '下一胎'])) {
+          return '我们最想知道下一胎风险大不大。也想知道有没有什么检查能在孕期早点看出来。';
+        }
+      }
+
+      if (caseData.caseId === 'case8') {
+        if (includesAny(q, ['视力', '眼睛', '什么时候', '症状'])) {
+          return '最近一段时间视力下降比较明显，尤其看东西中心不清楚。眼科医生说视神经这边有问题，建议我进一步查原因。';
+        }
+        if (includesAny(q, ['母系', '妈妈', '舅舅', '家族', '亲属'])) {
+          return '我妈妈那边好像有亲戚年轻时视力就不太好，但以前没有系统诊断。爸爸这边我没听说类似情况。';
+        }
+        if (includesAny(q, ['抽烟', '喝酒', '诱因', '生活'])) {
+          return '我平时偶尔喝酒，最近压力也比较大。医生提醒我如果真是遗传相关视神经问题，生活方式也要注意。';
+        }
+        if (includesAny(q, ['孩子', '生育', '遗传', '传给'])) {
+          return '我最怕的是以后孩子会不会受影响，也想知道家里哪些亲属需要注意。这个遗传方式我完全不懂。';
+        }
+      }
+
+      if (caseData.caseId === 'case9') {
+        if (includesAny(q, ['结婚', '多久', '备孕', '不育'])) {
+          return '我们结婚两三年了，一直没有避孕，但也没有怀上。后来才开始系统查不育原因。';
+        }
+        if (includesAny(q, ['精液', '精子', '无精', '少精'])) {
+          return '精液检查结果不太好，医生说精子数量非常少，甚至接近没有，所以建议我继续查原因。';
+        }
+        if (includesAny(q, ['发育', '青春期', '睾丸', '激素', '身高'])) {
+          return '我以前没觉得自己有特别大的问题，但医生问过青春期发育、睾丸大小和激素这些情况，我才意识到可能有关。';
+        }
+        if (includesAny(q, ['孩子', '生育', '试管', '后代'])) {
+          return '我最关心的是还有没有机会有自己的孩子。如果将来能通过辅助生殖，我也想知道会不会把问题传给孩子。';
+        }
+      }
+
+      if (includesAny(q, ['为什么', '来咨询', '担心', '想问'])) {
+        return getLocalChiefConcernReply(caseData);
+      }
+      if (includesAny(q, ['检查', '检测', '下一步'])) {
+        return '如果有必要检查，我愿意配合。只是我希望先知道这个检查能解决什么问题，会不会有风险或局限。';
+      }
+      if (includesAny(q, ['家族', '亲属', '遗传'])) {
+        return '家里确实有一些相关情况，但以前大家没有系统整理过。您问到哪一方面，我可以尽量回忆。';
+      }
+      if (isShortAdvance) {
+        return '好的，我明白。您可以继续问，我会尽量配合把情况说清楚。';
+      }
+      return pickLocalReply([
+        '医生，这个问题我不太确定该怎么回答。您能不能换一种更具体的问法，比如问以前检查、家族情况或者我现在最担心什么？',
+        '我可能没完全听懂您的意思。您如果问得更具体一点，我会尽量把我知道的情况告诉您。',
+        '这方面我了解得不多，所以不敢乱说。您可以继续问病史或者检查报告，我会按实际情况回答。'
+      ]);
+    }
+
+    function runLocalTest(caseId, testId, previousCompleted = []) {
+      const tests = getLocalTests(caseId);
+      const test = tests.find(item => item.testId === testId);
+      if (!test) {
+        return { ok: false, error: '未找到该本地检查项目。' };
+      }
+      const nextCompleted = [...new Set([...(previousCompleted || []), testId])];
+      return {
+        ok: true,
+        caseId,
+        testId,
+        testName: test.name,
+        resultTitle: test.resultTitle || test.name,
+        resultText: test.resultText || '本地演示检查已完成。',
+        teachingValue: test.teachingValue || '',
+        interpretationHint: test.interpretationHint || '',
+        warning: test.warning || '',
+        completedTests: nextCompleted,
+        mode: 'local-static'
+      };
+    }
+
+    function buildLocalScore() {
+      const allText = conversationHistory.map(item => item.content || '').join('\n');
+      const q = normalizeText(allText);
+      const selectedCaseId = caseSelect.value;
+      const isDown = selectedCaseId === 'case4';
+      const hasReview = completedTests.includes('case4_review_reports');
+      const hasUltrasound = completedTests.includes('case4_ultrasound');
+      const hasAmnio = completedTests.includes('case4_amniocentesis_karyotype');
+      const hasDistractor = completedTests.includes('case4_couple_karyotype');
+      const hasScreeningExplanation =
+        dialogueState.explainedScreeningNotDiagnosis ||
+        includesAny(q, ['筛查不是诊断', '筛查不能确诊']);
+      const hasNiptExplanation =
+        dialogueState.explainedNiptNotDiagnosis ||
+        includesAny(q, ['nipt不是诊断', '无创不是诊断', '风险评估']);
+      const hasAnxietyResponse =
+        dialogueState.addressedAnxiety ||
+        includesAny(q, ['理解您', '焦虑', '紧张', '害怕', '担心']);
+      const hasConsentAndAutonomy =
+        dialogueState.mentionedConsent &&
+        dialogueState.respectedAutonomy;
+
+      let medical = 12;
+      if (hasScreeningExplanation) medical += 7;
+      if (dialogueState.explainedHighRiskNotConfirmed || includesAny(q, ['高风险不等于确诊', '不是确诊'])) medical += 6;
+      if (hasNiptExplanation) medical += 5;
+      medical = Math.min(30, medical);
+
+      let pathway = 8 + Math.min(completedTests.length, 3) * 3;
+      if (isDown && hasReview) pathway += 4;
+      if (isDown && hasUltrasound) pathway += 3;
+      if (isDown && hasAmnio) pathway += 8;
+      if (isDown && hasDistractor && !hasAmnio) pathway -= 4;
+      if (dialogueState.mentionedAmniocentesis) pathway += 2;
+      if (dialogueState.mentionedKaryotype || dialogueState.mentionedPrenatalDiagnosis) pathway += 2;
+      pathway = Math.max(0, Math.min(25, pathway));
+
+      let empathy = 8;
+      if (hasAnxietyResponse) empathy += 8;
+      if (conversationHistory.filter(item => item.role === 'student').length >= 3) empathy += 4;
+      empathy = Math.min(20, empathy);
+
+      let ethics = 5;
+      if (dialogueState.mentionedConsent) ethics += 5;
+      if (dialogueState.respectedAutonomy) ethics += 4;
+      if (dialogueState.avoidedDirectTermination) ethics += 4;
+      if (!dialogueState.avoidedDirectTermination) ethics -= 5;
+      ethics = Math.max(0, Math.min(15, ethics));
+
+      let language = 6;
+      if (allText.length > 120) language += 2;
+      if (includesAny(q, ['先', '下一步', '建议', '同时', '不能'])) language += 2;
+      language = Math.min(10, language);
+
+      const total = medical + pathway + empathy + ethics + language;
+      const strengths = [];
+      const gaps = [];
+      const suggestions = [];
+
+      if (medical >= 24) strengths.push('能区分筛查、风险评估与诊断，医学边界较清楚。');
+      if (pathway >= 20) strengths.push('检查路径较合理，能把羊水穿刺和胎儿染色体核型分析作为确诊关键。');
+      if (empathy >= 16) strengths.push('能回应患者焦虑，沟通语气较稳定。');
+      if (ethics >= 12) strengths.push('体现知情同意和自主选择，未直接替患者做决定。');
+
+      if (!hasScreeningExplanation) gaps.push('尚未明确说明“筛查不是诊断”。');
+      if (!hasNiptExplanation) gaps.push('NIPT仍属于风险评估这一点不够突出。');
+      if (isDown && !hasAmnio && !dialogueState.mentionedAmniocentesis) gaps.push('未充分提出羊水穿刺和胎儿染色体核型分析。');
+      if (!hasAnxietyResponse) gaps.push('对患者焦虑的回应不足。');
+      if (!hasConsentAndAutonomy) gaps.push('知情同意和自主选择表达还可加强。');
+      if (!dialogueState.avoidedDirectTermination) gaps.push('出现了过早或直接建议终止妊娠的表达，需要避免。');
+
+      suggestions.push('先安抚情绪，再解释报告性质，最后给出下一步诊断路径。');
+      suggestions.push('说明羊水穿刺的目的、收益、风险和局限，并确认患者理解。');
+      suggestions.push('对终止妊娠相关问题保持中立，基于确诊结果和患者价值观进行支持性咨询。');
+
+      return {
+        total,
+        dimensions: { medical, pathway, empathy, ethics, language },
+        strengths: strengths.length ? strengths : ['已完成基本问诊流程，能够围绕患者主要担忧展开。'],
+        gaps: gaps.length ? gaps : ['整体要点较完整，可继续提高表达的结构化程度。'],
+        suggestions,
+        sample: '可以这样表达：您现在看到的是筛查高风险，不等于已经确诊；NIPT也仍是风险评估。下一步建议在充分知情同意后考虑羊水穿刺，进行胎儿染色体核型分析来明确诊断。无论后续结果如何，我们都会把信息、风险和可选方案讲清楚，由您和家属自主决定。',
+        nextGoal: '下次训练目标：在2分钟内完成“共情安抚、筛查与诊断区分、产前诊断路径、知情同意与自主选择”四步说明。'
+      };
+    }
+
+    function getScoreLevel(total) {
+      if (total >= 90) return '优秀：咨询结构完整，适合课堂示范';
+      if (total >= 80) return '良好：关键路径基本完整';
+      if (total >= 70) return '合格：已覆盖主要目标，仍需补强';
+      return '待提升：建议回到病例目标重新训练';
+    }
+
+    function renderLocalScore() {
+      const score = buildLocalScore();
+      scoringBox.innerHTML = `
+        <div class="score-card">
+          <div class="score-total">总分：${score.total}/100</div>
+          <div class="score-level">${escapeHtml(getScoreLevel(score.total))}</div>
+          <div class="score-grid">
+            <div>医学准确性：${score.dimensions.medical}/30</div>
+            <div>检查/干预路径：${score.dimensions.pathway}/25</div>
+            <div>沟通共情：${score.dimensions.empathy}/20</div>
+            <div>伦理与知情同意：${score.dimensions.ethics}/15</div>
+            <div>语言表达：${score.dimensions.language}/10</div>
+          </div>
+          <strong>关键优点：</strong>
+${escapeHtml(score.strengths.map((item, index) => `${index + 1}. ${item}`).join('\n'))}
+
+<strong>主要不足：</strong>
+${escapeHtml(score.gaps.map((item, index) => `${index + 1}. ${item}`).join('\n'))}
+
+<strong>建议补强：</strong>
+${escapeHtml(score.suggestions.map((item, index) => `${index + 1}. ${item}`).join('\n'))}
+
+<strong>可参考改进话术：</strong>
+${escapeHtml(score.sample)}
+
+<strong>下次训练目标：</strong>
+${escapeHtml(score.nextGoal)}
+        </div>
+      `;
+    }
+
+    function setChatPlaceholder(text) {
+      chatBox.innerHTML = `
+        <div class="message system">
+          <span class="message-role">系统提示</span>
+          ${escapeHtml(text)}
+        </div>
+      `;
+    }
+
+    function setChatControlsDisabled(disabled) {
+      messageInput.disabled = disabled;
+      sendBtn.disabled = disabled;
+    }
+
+    function setSessionControlsDisabled(disabled) {
+      caseSelect.disabled = disabled;
+      startBtn.disabled = disabled;
+      reloadTestsBtn.disabled = disabled;
+      if (demoTestsBtn) demoTestsBtn.disabled = disabled;
+      modeSelect.disabled = disabled;
+      apiEndpoint.disabled = disabled;
+      groupName.disabled = disabled;
+      endBtn.disabled = disabled;
+    }
+
+    function resetConsultationSession(placeholderText = '请先选择病例并点击“开始问诊”。') {
+      started = false;
+      consultationEnded = false;
+      conversationHistory = [];
+      dialogueState = createDialogueState();
+      lastLocalReply = '';
+      surfacedMaterialIds = [];
+      viewedMaterialIds = [];
+      isLoading = false;
+      isTestRunning = false;
+      messageInput.value = '';
+      scoringBox.innerHTML = '结束问诊后生成评分反馈。';
+      setChatControlsDisabled(false);
+      setSessionControlsDisabled(false);
+      currentModeBox.value = '尚未开始问诊';
+      setChatPlaceholder(placeholderText);
+    }
+
+    function appendMessage(role, text, extra = {}) {
+      const message = document.createElement('div');
+      message.className = `message ${role}`;
+
+      if (role === 'patient') {
+        message.innerHTML = `<span class="message-role">患者</span>${escapeHtml(text)}`;
+      } else if (role === 'student') {
+        message.innerHTML = `<span class="message-role">学生</span>${escapeHtml(text)}`;
+      } else if (role === 'material-card') {
+        message.innerHTML = `
+          <span class="message-role">系统材料</span>
+          <div class="material-title">${escapeHtml(extra.title || '材料')}</div>
+          <div class="material-desc">${escapeHtml(text)}</div>
+          <button class="material-btn" type="button">${escapeHtml(extra.actionText || '查看材料')}</button>
+        `;
+
+        const btn = message.querySelector('.material-btn');
+        btn.addEventListener('click', () => {
+          if (extra.materialId) {
+            viewMaterial(extra.materialId);
+          }
+        });
+      } else if (role === 'material-detail') {
+        message.innerHTML = `
+          <span class="message-role">系统材料内容</span>
+          <div class="material-title">${escapeHtml(extra.title || '材料详情')}</div>
+          <pre class="material-pre">${escapeHtml(text)}</pre>
+        `;
+      } else {
+        message.innerHTML = `<span class="message-role">系统提示</span>${escapeHtml(text)}`;
+      }
+
+      chatBox.appendChild(message);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    async function viewMaterial(materialId) {
+      const chatUrl = apiEndpoint.value.trim();
+      const selectedCaseId = caseSelect.value;
+
+      const localMaterial = getLocalMaterialById(selectedCaseId, materialId);
+      if (localMaterial) {
+        const detailText = (localMaterial.detail || []).join('\n') || '暂无材料内容。';
+        const detailTitle = `已打开材料《${localMaterial.title || '既往检查材料'}》`;
+
+        appendMessage('material-detail', detailText, { title: detailTitle });
+        conversationHistory.push({
+          role: 'system',
+          content: `${detailTitle}\n${detailText}`
+        });
+        if (!viewedMaterialIds.includes(materialId)) {
+          viewedMaterialIds.push(materialId);
+        }
+        statusBox.value = `已打开材料：${localMaterial.title || '既往检查材料'}`;
+        renderTests();
+        return;
+      }
+
+      if (!chatUrl || !selectedCaseId) {
+        appendMessage('system', '缺少病例或接口地址，无法查看材料。');
+        return;
+      }
+
+      const viewUrl = `${getBaseApiUrl(chatUrl)}/api/materials/view`;
+
+      try {
+        statusBox.value = '正在打开外院报告材料...';
+
+        const response = await fetch(viewUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            caseId: selectedCaseId,
+            materialId
+          })
+        });
+
+        const data = await safeReadJson(response);
+
+        if (!response.ok || !data.ok) {
+          throw new Error(data.error || `查看材料失败：${response.status}`);
+        }
+
+        const detailText =
+          (data.chatMessage && data.chatMessage.content) ||
+          (Array.isArray(data.detail) ? data.detail.join('\n') : '') ||
+          '暂无材料内容。';
+
+        const detailTitle =
+          (data.chatMessage && data.chatMessage.title) ||
+          `已打开材料《${data.title || '未命名材料'}》`;
+
+        appendMessage('material-detail', detailText, { title: detailTitle });
+        conversationHistory.push({
+          role: 'system',
+          content: `${detailTitle}\n${detailText}`
+        });
+
+        statusBox.value = `已打开材料：${data.title || '未命名材料'}`;
+      } catch (error) {
+        console.error(error);
+        appendMessage('system', `查看材料失败：${error.message}`);
+        statusBox.value = `查看材料失败：${error.message}`;
+      }
+    }
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function appendTestFlowSystemMessage(text) {
+      appendMessage('system', text);
+    }
+
+    function findCurrentTestItem(testId) {
+      return currentTests.find(item => item.testId === testId) || null;
+    }
+
+    function getPatientReturnMessageAfterTest(testItem) {
+      const type = testItem?.type || '';
+      const caseId = caseSelect.value;
+
+      if (caseId === 'case1') {
+        if (type === 'information') {
+          return '医生，我把相关资料弄来了，您帮我看看这些资料有没有用，好吗？';
+        }
+        if (type === 'genetic') {
+          return '医生，这个检查结果是不是已经出来了？我有点紧张，您帮我看看这是不是说明会影响以后生孩子。';
+        }
+        if (type === 'laboratory') {
+          return '医生，我检查做完了，您帮我看看结果吧。我还是有点担心，这个结果能说明问题吗？';
+        }
+        if (type === 'distractor') {
+          return '医生，这个检查结果出来了吗？我不太懂它和我现在担心的事情是不是有关系。';
+        }
+      }
+
+      if (caseId === 'case2') {
+        if (type === 'genetic') {
+          return '医生，这个结果是不是已经出来了？我现在最担心的是，我和对象会不会都有什么问题，会不会影响以后孩子。';
+        }
+        if (type === 'laboratory') {
+          return '医生，我检查做完了。这个结果是不是能看出来，我这种情况到底是不是普通贫血？';
+        }
+        if (type === 'distractor') {
+          return '医生，这个检查结果出来了吗？我不太明白它和我们以后生孩子有没有直接关系。';
+        }
+      }
+
+      if (caseId === 'case4') {
+        if (testItem?.testId === 'case4_review_reports') {
+          return '医生，您复核以后，我想再确认一下：这些报告是不是都还只是提示风险？那我现在是不是还不能说宝宝已经确诊了？';
+        }
+        if (testItem?.testId === 'case4_ultrasound') {
+          return '超声没看到明显问题，我稍微松了一口气。但这是不是也不能完全排除21三体？我还是有点不踏实。';
+        }
+        if (testItem?.testId === 'case4_amniocentesis_karyotype') {
+          return '这个结果听起来就比较明确了，我心里很难受。接下来我们是不是需要先听清楚这个诊断代表什么，再考虑后面的选择？';
+        }
+        if (testItem?.testId === 'case4_couple_karyotype') {
+          return '我们夫妻的检查正常，那是不是说明宝宝就没事了？还是说这和胎儿自己的诊断不是一回事？';
+        }
+      }
+
+      if (type === 'information') {
+        return '医生，我把相关资料弄来了，您帮我看看这些资料有没有用，好吗？';
+      }
+
+      if (type === 'genetic') {
+        return '医生，这个检查结果是不是已经出来了？是不是会更准确一点？您帮我看看吧。';
+      }
+
+      if (type === 'laboratory') {
+        return '医生，我检查做完了，您帮我看看结果吧。我还是有点担心，这个结果能说明问题吗？';
+      }
+
+      if (type === 'distractor') {
+        return '医生，这个检查结果出来了吗？我不太懂它和我现在担心的事情是不是有关系。';
+      }
+
+      return '医生，我检查已经做完了，您帮我看看结果吧。';
+    }
+
+    function updateCaseBasicInfo() {
+      const selectedCase = cases[caseSelect.value];
+
+      if (!selectedCase) {
+        caseBasicInfo.value = '';
+        return;
+      }
+
+      const profile = selectedCase.patientProfile || {};
+      const lines = [
+        `病例：${selectedCase.title || selectedCase.displayName || '未提供'}`,
+        `身份：${selectedCase.identity || '未提供'}`,
+        `性别：${profile.gender || '未提供'}`,
+        `年龄：${profile.age || '未提供'}`,
+        `婚姻/生育状态：${profile.maritalStatus || '未提供'}`,
+        `主诉/关注：${selectedCase.chiefConcern || '未提供'}`
+      ];
+
+      caseBasicInfo.value = lines.join('\n');
+    }
+
+    function fillCaseSelect(caseList) {
+      caseSelect.innerHTML = '';
+
+      caseList.forEach((item, index) => {
+        cases[item.caseId] = {
+          caseId: item.caseId,
+          title: item.title,
+          shortTitle: item.shortTitle || '',
+          displayName: item.shortTitle || item.title || `病例${index + 1}`,
+          opening: item.opening,
+          chiefConcern: item.chiefConcern || '',
+          identity: item.identity || '',
+          patientProfile: item.patientProfile || {},
+          tests: item.tests || []
+        };
+
+        const option = document.createElement('option');
+        option.value = item.caseId;
+        option.textContent = item.shortTitle || item.title || `病例${index + 1}`;
+        caseSelect.appendChild(option);
+      });
+    }
+
+    async function loadCasesFromBackend() {
+      activateLocalMode('已预加载本地病例；正在尝试连接在线 AI 后端。');
+      currentTests = getLocalTests(caseSelect.value);
+      resetTestModuleState();
+      resetConsultationSession('病例已加载。若在线 AI 后端可用，系统会自动切换为 AI 模式；否则可直接使用本地演示模式。');
+      renderTests();
+
+      const chatUrl = apiEndpoint.value.trim();
+      if (!chatUrl) {
+        statusBox.value = '未配置在线后端地址，已启用本地演示模式。';
+        return;
+      }
+
+      const casesUrl = `${getBaseApiUrl(chatUrl)}/api/cases`;
+      statusBox.value = '正在从后端加载病例列表...';
+      setChatPlaceholder('正在从后端加载病例，请稍候。');
+
+      try {
+        setSessionControlsDisabled(true);
+        const response = await fetch(casesUrl);
+        const data = await safeReadJson(response);
+
+        if (!response.ok) {
+          throw new Error(data.error || `加载病例失败：${response.status}`);
+        }
+
+        const caseList = Array.isArray(data.cases) ? data.cases : [];
+
+        if (!caseList.length) {
+          throw new Error('后端未返回可用病例。');
+        }
+
+        cases = {};
+        localModeActive = false;
+        fillCaseSelect(caseList);
+        updateCaseBasicInfo();
+
+        currentTests = [];
+        resetTestModuleState();
+        resetConsultationSession('病例已从后端加载完成，请选择病例并点击“开始问诊”。');
+        statusBox.value = '病例加载成功，可开始问诊。';
+
+        await loadTestsForCurrentCase();
+      } catch (error) {
+        console.error(error);
+        activateLocalMode(error.message || '无法连接后端病例接口');
+        currentTests = getLocalTests(caseSelect.value);
+        resetTestModuleState();
+        resetConsultationSession('后端病例接口不可用，已加载前端本地病例库。请选择病例并点击“开始问诊”。');
+        statusBox.value = `后端病例加载失败，已启用本地模式：${error.message}`;
+        renderTests();
+      } finally {
+        setSessionControlsDisabled(false);
+      }
+    }
+
+    async function loadTestsForCurrentCase() {
+      const chatUrl = apiEndpoint.value.trim();
+      const selectedCaseId = caseSelect.value;
+
+      currentTests = [];
+      renderTests();
+
+      if (localModeActive) {
+        currentTests = getLocalTests(selectedCaseId);
+        renderTests();
+        statusBox.value = '已加载本地检查项目。';
+        return;
+      }
+
+      if (!chatUrl || !selectedCaseId) {
+        currentTests = getLocalTests(selectedCaseId);
+        renderTests();
+        statusBox.value = '后端地址为空，已使用本地检查项目。';
+        return;
+      }
+
+      const testsUrl = `${getBaseApiUrl(chatUrl)}/api/cases/${selectedCaseId}/tests`;
+
+      try {
+        testsBox.innerHTML = '<div class="tiny">正在加载检查列表...</div>';
+        const response = await fetch(testsUrl);
+        const data = await safeReadJson(response);
+
+        if (!response.ok) {
+          throw new Error(data.error || `检查列表加载失败：${response.status}`);
+        }
+
+        currentTests = Array.isArray(data.tests) ? data.tests : [];
+        renderTests();
+      } catch (error) {
+        console.error(error);
+        localModeActive = true;
+        currentTests = getLocalTests(selectedCaseId);
+        renderTests();
+        statusBox.value = `检查列表接口不可用，已使用本地检查项目：${error.message}`;
+      }
+    }
+
+    function getVisibleTests() {
+      const priorMaterialTestIds = getPriorMaterialTestIds(caseSelect.value);
+      return currentTests.filter(item => {
+        if (completedTests.includes(item.testId)) return false;
+        if (priorMaterialTestIds.includes(item.testId)) return false;
+
+        const prerequisites = Array.isArray(item.prerequisites) ? item.prerequisites : [];
+        return prerequisites.every(prereq => completedTests.includes(prereq));
+      });
+    }
+
+    function renderTests() {
+      const canRunTests = started && !consultationEnded && !isLoading && !isTestRunning;
+
+      if (completedTests.length >= MAX_TESTS_PER_CASE) {
+        testsBox.innerHTML = `<div class="tiny">本病例已达到检查数量上限（${MAX_TESTS_PER_CASE} 项）。请结合现有信息进行判断。</div>`;
+        return;
+      }
+
+      if (!currentTests.length) {
+        testsBox.innerHTML = '<div class="tiny">尚未加载检查项目。</div>';
+        return;
+      }
+
+      const visibleTests = getVisibleTests();
+
+      if (!visibleTests.length) {
+        testsBox.innerHTML = '<div class="tiny">当前没有新的可选检查。请结合现有问诊与检查信息继续判断。</div>';
+        return;
+      }
+
+      let topNote = '';
+      if (!started) {
+        topNote = '<div class="tiny" style="margin-bottom:10px;">请先点击左侧“开始问诊”，再选择检查。</div>';
+      } else if (consultationEnded) {
+        topNote = '<div class="tiny" style="margin-bottom:10px;">本轮问诊已结束，不能再新增检查。</div>';
+      } else if (isLoading || isTestRunning) {
+        topNote = '<div class="tiny" style="margin-bottom:10px;">当前流程处理中，请稍候。</div>';
+      }
+
+      const html = visibleTests.map(item => `
+        <div class="test-item">
+          <div class="test-name">${escapeHtml(item.name)}</div>
+          <div class="test-actions">
+            <button
+              class="primary"
+              data-test-id="${escapeHtml(item.testId)}"
+              ${canRunTests ? '' : 'disabled'}
+            >
+              选择此检查
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      testsBox.innerHTML = `${topNote}${html}`;
+
+      testsBox.querySelectorAll('button[data-test-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const testId = btn.getAttribute('data-test-id');
+          runSelectedTest(testId);
+        });
+      });
+    }
+
+    function renderCompletedTests() {
+      if (!completedTests.length) {
+        completedTestsBox.innerHTML = '暂无已完成检查。';
+        return;
+      }
+
+      const names = completedTests.map(id => {
+        const found = currentTests.find(item => item.testId === id);
+        return found ? found.name : id;
+      });
+
+      completedTestsBox.innerHTML = names
+        .map((name, index) => `${index + 1}. ${escapeHtml(name)}`)
+        .join('<br>');
+    }
+
+    function renderTestResult(result) {
+      if (!result) {
+        testResultBox.innerHTML = '尚未执行检查。';
+        return;
+      }
+
+      let html = `
+        <div class="result-card">
+          <div class="result-title">${escapeHtml(result.resultTitle || result.testName || '检查结果')}</div>
+          <div><strong>检查名称：</strong>${escapeHtml(result.testName || '')}</div>
+          <div><strong>结果内容：</strong>${escapeHtml(result.resultText || '')}</div>
+      `;
+
+      if (result.teachingValue) {
+        html += `<div class="success-note"><strong>教学意义：</strong>${escapeHtml(result.teachingValue)}</div>`;
+      }
+
+      if (result.interpretationHint) {
+        html += `<div class="success-note"><strong>结果提示：</strong>${escapeHtml(result.interpretationHint)}</div>`;
+      }
+
+      if (result.warning) {
+        html += `<div class="warning">${escapeHtml(result.warning)}</div>`;
+      }
+
+      html += '</div>';
+      testResultBox.innerHTML = html;
+    }
+
+    function resetTestModuleState() {
+      completedTests = [];
+      currentTestResult = null;
+      renderCompletedTests();
+      renderTestResult(null);
+      renderTests();
+    }
+
+    function startConsultation() {
+      const selectedCase = cases[caseSelect.value];
+      if (!selectedCase) {
+        appendMessage('system', '当前没有可用病例，请先确认病例是否加载成功。');
+        return;
+      }
+
+      chatBox.innerHTML = '';
+      consultationEnded = false;
+      started = true;
+      isLoading = false;
+      isTestRunning = false;
+      conversationHistory = [];
+      dialogueState = createDialogueState();
+      lastLocalReply = '';
+      surfacedMaterialIds = [];
+      viewedMaterialIds = [];
+      scoringBox.innerHTML = '结束问诊后生成评分反馈。';
+      setChatControlsDisabled(false);
+
+      appendMessage('system', `${groupName.value || '未命名小组'} 已进入 ${selectedCase.displayName || selectedCase.title}`);
+      appendMessage('patient', selectedCase.opening);
+      conversationHistory.push({ role: 'patient', content: selectedCase.opening });
+
+      statusBox.value = '问诊已开始，可发送消息。';
+      currentModeBox.value = `当前预设模式：${modeSelect.value}`;
+      resetTestModuleState();
+      renderTests();
+      messageInput.focus();
+    }
+
+    async function sendMessage() {
+      const text = messageInput.value.trim();
+      const selectedCase = cases[caseSelect.value];
+
+      if (!started) {
+        appendMessage('system', '请先点击“开始问诊”。');
+        return;
+      }
+
+      if (consultationEnded) {
+        appendMessage('system', '本轮问诊已结束，请重新开始。');
+        return;
+      }
+
+      if (isLoading) {
+        appendMessage('system', '患者正在回答，请稍候。');
+        return;
+      }
+
+      if (isTestRunning) {
+        appendMessage('system', '检查正在进行中，请先等待检查流程结束。');
+        return;
+      }
+
+      if (!text) return;
+
+      if (!selectedCase) {
+        appendMessage('system', '当前病例不存在，请重新加载页面。');
+        return;
+      }
+
+      appendMessage('student', text);
+      conversationHistory.push({ role: 'student', content: text });
+      updateDialogueStateFromStudent(text);
+      messageInput.value = '';
+
+      const endpoint = apiEndpoint.value.trim();
+      if (!endpoint || localModeActive) {
+        const patientReply = generateLocalPatientReply(getLocalCase(caseSelect.value), text);
+        appendMessage('patient', patientReply);
+        conversationHistory.push({ role: 'patient', content: patientReply });
+        maybeShowLocalMaterialCard(caseSelect.value, text);
+        localModeActive = true;
+        statusBox.value = endpoint ? '已使用前端本地患者回复。' : '后端地址为空，已使用前端本地患者回复。';
+        currentModeBox.value = '当前返回模式：前端本地静态演示';
+        return;
+      }
+
+      isLoading = true;
+      statusBox.value = '正在请求患者回复...';
+      setSessionControlsDisabled(true);
+      renderTests();
+
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            groupName: groupName.value || '未命名小组',
+            caseId: caseSelect.value,
+            caseTitle: selectedCase.title,
+            opening: selectedCase.opening,
+            message: text,
+            mode: modeSelect.value,
+            history: conversationHistory
+          })
+        });
+
+        const data = await safeReadJson(response);
+
+        if (!response.ok) {
+          throw new Error(data.error || `接口返回异常状态：${response.status}`);
+        }
+
+        const patientReply = data.reply || '患者暂时没有明确回应。';
+        const returnedMode = data.mode || modeSelect.value;
+
+        appendMessage('patient', patientReply);
+        conversationHistory.push({ role: 'patient', content: patientReply });
+
+        if (Array.isArray(data.extraCards) && data.extraCards.length > 0) {
+          data.extraCards.forEach(card => {
+            if (card.cardType === 'material_card') {
+              appendMessage('material-card', card.description || '患者提交了外院检查材料。', {
+                title: card.title || '外院检查材料',
+                actionText: card.actionText || '查看报告',
+                materialId: card.materialId
+              });
+            }
+          });
+        } else {
+          maybeShowLocalMaterialCard(caseSelect.value, text);
+        }
+
+        statusBox.value = data.fallbackNotice
+          ? `患者回复成功。${data.fallbackNotice}`
+          : '患者回复成功。';
+
+        currentModeBox.value = `当前返回模式：${returnedMode}`;
+      } catch (error) {
+        console.error(error);
+        localModeActive = true;
+        const patientReply = generateLocalPatientReply(getLocalCase(caseSelect.value), text);
+        appendMessage('patient', patientReply);
+        conversationHistory.push({ role: 'patient', content: patientReply });
+        maybeShowLocalMaterialCard(caseSelect.value, text);
+        statusBox.value = `后端回复失败，已启用本地患者回复：${error.message}`;
+        currentModeBox.value = '当前返回模式：前端本地静态演示';
+      } finally {
+        isLoading = false;
+        setSessionControlsDisabled(false);
+        renderTests();
+      }
+    }
+
+    async function runSelectedTest(testId) {
+      if (!started) {
+        appendMessage('system', '请先开始问诊，再选择检查。');
+        return;
+      }
+
+      if (consultationEnded) {
+        appendMessage('system', '本轮问诊已结束，不能再新增检查。');
+        return;
+      }
+
+      if (isLoading) {
+        appendMessage('system', '患者正在回答，请稍后再选择检查。');
+        return;
+      }
+
+      if (isTestRunning) {
+        appendMessage('system', '已有检查正在进行，请稍候。');
+        return;
+      }
+
+      if (completedTests.length >= MAX_TESTS_PER_CASE) {
+        statusBox.value = `本病例最多只能选择 ${MAX_TESTS_PER_CASE} 项检查。`;
+        return;
+      }
+
+      const chatUrl = apiEndpoint.value.trim();
+      const selectedCaseId = caseSelect.value;
+
+      if (!selectedCaseId) {
+        statusBox.value = '缺少病例，无法执行检查。';
+        return;
+      }
+
+      const testItem = findCurrentTestItem(testId);
+      if (!testItem) {
+        appendMessage('system', '未找到该检查项目，请刷新检查列表后重试。');
+        return;
+      }
+
+      const runUrl = `${getBaseApiUrl(chatUrl)}/api/tests/run`;
+
+      try {
+        isTestRunning = true;
+        setChatControlsDisabled(true);
+        setSessionControlsDisabled(true);
+        renderTests();
+        statusBox.value = `已申请检查：${testItem.name}`;
+
+        appendTestFlowSystemMessage(`已申请检查：${testItem.name}`);
+        await sleep(500);
+
+        appendTestFlowSystemMessage('检查正在进行……');
+        await sleep(1000);
+
+        let data;
+
+        if (localModeActive || !chatUrl) {
+          localModeActive = true;
+          data = runLocalTest(selectedCaseId, testId, completedTests);
+        } else {
+          const response = await fetch(runUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              caseId: selectedCaseId,
+              testId,
+              completedTests
+            })
+          });
+
+          data = await safeReadJson(response);
+
+          if (!response.ok || !data.ok) {
+            throw new Error(data.error || `检查执行失败：${response.status}`);
+          }
+        }
+
+        if (!data.ok) {
+          throw new Error(data.error || '检查执行失败。');
+        }
+
+        completedTests = Array.isArray(data.completedTests) ? data.completedTests : completedTests;
+        currentTestResult = data;
+        conversationHistory.push({
+          role: 'system',
+          content: `已完成检查：${data.testName || testItem.name}\n检查结果：${data.resultText || ''}`
+        });
+
+        renderCompletedTests();
+        renderTestResult(data);
+        renderTests();
+
+        appendTestFlowSystemMessage('检查已完成，请查看右侧结果。');
+        await sleep(500);
+
+        const patientReturnMessage = getPatientReturnMessageAfterTest(testItem);
+        appendMessage('patient', patientReturnMessage);
+        conversationHistory.push({ role: 'patient', content: patientReturnMessage });
+
+        statusBox.value = `检查完成：${data.testName || testItem.name}`;
+      } catch (error) {
+        console.error(error);
+        localModeActive = true;
+        const data = runLocalTest(selectedCaseId, testId, completedTests);
+        if (data.ok) {
+          completedTests = data.completedTests;
+          currentTestResult = data;
+          conversationHistory.push({
+            role: 'system',
+            content: `已完成检查：${data.testName || testItem.name}\n检查结果：${data.resultText || ''}`
+          });
+          renderCompletedTests();
+          renderTestResult(data);
+          appendTestFlowSystemMessage('后端检查接口不可用，已返回本地检查结果。');
+          const patientReturnMessage = getPatientReturnMessageAfterTest(testItem);
+          appendMessage('patient', patientReturnMessage);
+          conversationHistory.push({ role: 'patient', content: patientReturnMessage });
+          statusBox.value = `已启用本地检查结果：${data.testName || testItem.name}`;
+        } else {
+          statusBox.value = `检查执行失败：${error.message}`;
+          renderTestResult({
+            resultTitle: '检查执行失败',
+            resultText: error.message
+          });
+          appendTestFlowSystemMessage(`检查执行失败：${error.message}`);
+        }
+      } finally {
+        isTestRunning = false;
+        setChatControlsDisabled(false);
+        setSessionControlsDisabled(false);
+        renderTests();
+        messageInput.focus();
+      }
+    }
+
+    async function runRecommendedDemoTests() {
+      if (!started) {
+        appendMessage('system', '请先点击“开始问诊”，再演示推荐检查路径。');
+        return;
+      }
+
+      if (consultationEnded) {
+        appendMessage('system', '本轮问诊已结束，不能新增检查。');
+        return;
+      }
+
+      if (caseSelect.value !== 'case4') {
+        appendMessage('system', '推荐检查路径用于演示 Down 产前筛查高风险病例。请先选择病例4。');
+        return;
+      }
+
+      const recommendedPath = [
+        'case4_review_reports',
+        'case4_ultrasound',
+        'case4_amniocentesis_karyotype'
+      ];
+      const pending = recommendedPath.filter(id => !completedTests.includes(id));
+
+      if (!pending.length) {
+        appendMessage('system', '推荐检查路径已完成。');
+        return;
+      }
+
+      for (const testId of pending) {
+        if (completedTests.length >= MAX_TESTS_PER_CASE || consultationEnded) break;
+        await runSelectedTest(testId);
+      }
+    }
+
+    function endConsultation() {
+      if (!started) {
+        appendMessage('system', '当前还没有开始问诊。');
+        return;
+      }
+
+      if (consultationEnded) {
+        appendMessage('system', '本轮问诊已经结束。');
+        return;
+      }
+
+      consultationEnded = true;
+      setChatControlsDisabled(true);
+      renderTests();
+      renderLocalScore();
+      statusBox.value = `本轮问诊已结束，共记录 ${conversationHistory.length} 条对话。`;
+      appendMessage('system', '本轮问诊已结束。右侧已生成五维评分反馈，可继续查看已完成检查结果。');
+    }
+
+    function getVisibleChatLinesForCopy() {
+      const messages = [...chatBox.querySelectorAll('.message')];
+
+      return messages.map(messageEl => {
+        const clone = messageEl.cloneNode(true);
+        clone.querySelectorAll('button').forEach(btn => btn.remove());
+
+        const roleLabel = clone.querySelector('.message-role')?.innerText.trim() || '系统提示';
+        const roleNode = clone.querySelector('.message-role');
+        if (roleNode) {
+          roleNode.remove();
+        }
+
+        const content = clone.innerText.trim();
+        return content ? `${roleLabel}：${content}` : `${roleLabel}：`;
+      });
+    }
+
+    async function copyConversation() {
+      const selectedCase = cases[caseSelect.value];
+      const visibleLines = getVisibleChatLinesForCopy();
+
+      if (!visibleLines.length) {
+        appendMessage('system', '当前还没有可复制的对话记录。');
+        return;
+      }
+
+      const testsSummary = completedTests.length
+        ? completedTests.map(id => {
+            const found = currentTests.find(item => item.testId === id);
+            return found ? found.name : id;
+          }).join('；')
+        : '无';
+
+      const header = [
+        `小组：${groupName.value || '未命名小组'}`,
+        `病例：${selectedCase ? (selectedCase.displayName || selectedCase.title) : caseSelect.value}`,
+        `${currentModeBox.value}`,
+        `时间：${new Date().toLocaleString()}`,
+        `已完成检查：${testsSummary}`,
+        '------------------------------'
+      ].join('\n');
+
+      let testPart = '';
+      if (currentTestResult) {
+        testPart = `\n\n------------------------------\n最新检查结果：${currentTestResult.testName || ''}\n${currentTestResult.resultText || ''}`;
+      }
+
+      const fullText = `${header}\n${visibleLines.join('\n\n')}${testPart}`;
+
+      try {
+        await navigator.clipboard.writeText(fullText);
+        statusBox.value = '对话记录已复制到剪贴板。';
+      } catch (error) {
+        console.error(error);
+        statusBox.value = '复制失败，请手动截图或复制。';
+      }
+    }
+
+    caseSelect.addEventListener('change', async () => {
+      updateCaseBasicInfo();
+      currentTests = [];
+      resetConsultationSession('已切换病例，请重新点击“开始问诊”。');
+      resetTestModuleState();
+      await loadTestsForCurrentCase();
+      statusBox.value = '已切换病例，请重新开始问诊。';
+    });
+
+    modeSelect.addEventListener('change', () => {
+      if (!started) {
+        currentModeBox.value = '尚未开始问诊';
+        return;
+      }
+
+      if (!consultationEnded) {
+        currentModeBox.value = `当前预设模式：${modeSelect.value}`;
+      }
+    });
+
+    startBtn.addEventListener('click', startConsultation);
+    sendBtn.addEventListener('click', sendMessage);
+
+    clearBtn.addEventListener('click', () => {
+      messageInput.value = '';
+      messageInput.focus();
+    });
+
+    copyBtn.addEventListener('click', copyConversation);
+    endBtn.addEventListener('click', endConsultation);
+    reloadTestsBtn.addEventListener('click', loadTestsForCurrentCase);
+
+    if (demoTestsBtn) {
+      demoTestsBtn.addEventListener('click', runRecommendedDemoTests);
+    }
+
+    document.querySelectorAll('button[data-demo]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const key = btn.getAttribute('data-demo');
+        messageInput.value = LOCAL_DEMO_INPUTS[key] || '';
+        messageInput.focus();
+      });
+    });
+
+    messageInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    initializeCompetitionEndpoint();
+    loadCasesFromBackend();
+  </script>
+</body>
+</html>
