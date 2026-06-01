@@ -74,3 +74,69 @@ https://your-backend.example.com/api/health
 ```
 
 返回 `ok: true` 且 `aiReady: true` 时，说明 AI 后端已就绪。
+
+## 匿名研究日志
+
+本版本已内置匿名研究日志接口：
+
+```text
+GET  /api/research/status
+POST /api/research/event
+```
+
+前端在开始问诊、学生发言、患者回复、查看既往材料、选择检查和结束评分时会自动发送匿名事件。后端默认写入：
+
+```text
+research_logs/research_events_YYYY-MM-DD.jsonl
+```
+
+可通过环境变量关闭或改写保存目录：
+
+```text
+RESEARCH_LOGGING=false
+RESEARCH_LOG_DIR=/your/path/research_logs
+```
+
+注意：Render Free 等无持久磁盘平台在重启或重新部署后可能丢失本地日志。正式教学研究建议优先使用本地课堂后端收集，或后续接入数据库、对象存储、Google Sheets、Supabase 等持久化服务。研究数据仅建议填写匿名小组编号，不要收集姓名、学号、手机号等直接身份信息。
+
+本地日志导出为 CSV 可运行：
+
+```bash
+python export_research_logs_to_csv.py
+```
+
+将生成：
+
+```text
+research_events_export.csv
+research_sessions_export.csv
+```
+
+## Supabase 持久化研究日志
+
+如果需要课后线上训练数据长期保存，建议配置 Supabase。后端会在保留本地 JSONL 备份的同时，把匿名研究事件写入 Supabase。
+
+Render 环境变量：
+
+```text
+SUPABASE_URL=你的 Supabase Project URL
+SUPABASE_SERVICE_ROLE_KEY=你的 service_role key
+SUPABASE_RESEARCH_TABLE=research_events
+RESEARCH_LOGGING=true
+```
+
+建表 SQL 见：
+
+```text
+SUPABASE_RESEARCH_LOG_SETUP.sql
+```
+
+配置后访问：
+
+```text
+https://your-service.onrender.com/api/research/status
+```
+
+若返回 `storage: "jsonl+supabase"` 且 `supabaseConfigured: true`，说明线上研究日志已接入 Supabase。
+
+注意：`SUPABASE_SERVICE_ROLE_KEY` 只能放在 Render 后端环境变量，不要写入前端 HTML，也不要提交到 GitHub。

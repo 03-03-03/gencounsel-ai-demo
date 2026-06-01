@@ -1029,6 +1029,71 @@
     let dialogueState = {};
     let surfacedMaterialIds = [];
     let viewedMaterialIds = [];
+    let researchSessionId = '';
+    let researchEventIndex = 0;
+    let researchSessionStartedAt = '';
+
+    function createResearchSessionId() {
+      const timePart = new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 14);
+      const randomPart = Math.random().toString(36).slice(2, 8);
+      const casePart = caseSelect.value || 'case';
+      return casePart + '-' + timePart + '-' + randomPart;
+    }
+
+    function getResearchBaseUrl() {
+      const chatUrl = apiEndpoint.value.trim();
+      if (chatUrl) return getBaseApiUrl(chatUrl);
+      if (typeof getCompetitionApiBaseUrl === 'function') return getCompetitionApiBaseUrl();
+      return '';
+    }
+
+    function bufferResearchEvent(record) {
+      try {
+        const key = 'gencounsel_research_log_buffer';
+        const existing = JSON.parse(localStorage.getItem(key) || '[]');
+        existing.push(record);
+        localStorage.setItem(key, JSON.stringify(existing.slice(-300)));
+      } catch (error) {
+        console.warn('?????????????', error);
+      }
+    }
+
+    function getResearchCaseData() {
+      return cases[caseSelect.value] || getLocalCase(caseSelect.value) || {};
+    }
+
+    function logResearchEvent(eventType, payload = {}) {
+      if (!researchSessionId && eventType !== 'session_start') return;
+      const caseData = getResearchCaseData();
+      const record = {
+        sessionId: researchSessionId,
+        groupName: groupName.value || '?????',
+        caseId: caseSelect.value,
+        caseTitle: caseData.title || caseData.displayName || '',
+        eventType,
+        clientMode: localModeActive ? 'local-static' : modeSelect.value,
+        payload: {
+          ...payload,
+          eventIndex: ++researchEventIndex,
+          clientTimestamp: new Date().toISOString(),
+          pagePath: window.location.pathname || '',
+          completedTestsSnapshot: [...completedTests]
+        }
+      };
+
+      const baseUrl = getResearchBaseUrl();
+      if (!baseUrl) {
+        bufferResearchEvent(record);
+        return;
+      }
+
+      fetch(baseUrl + '/api/research/event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(record)
+      }).catch(() => bufferResearchEvent(record));
+    }
+
 
     function createDialogueState() {
       return {
@@ -1729,6 +1794,7 @@ ${escapeHtml(score.sample)}
 ${escapeHtml(score.nextGoal)}
         </div>
       `;
+      return score;
     }
 
     function setChatPlaceholder(text) {
@@ -1827,6 +1893,12 @@ ${escapeHtml(score.nextGoal)}
         if (!viewedMaterialIds.includes(materialId)) {
           viewedMaterialIds.push(materialId);
         }
+        logResearchEvent('material_view', {
+          materialId,
+          title: localMaterial.title || 'prior material',
+          source: 'local-static',
+          detailText
+        });
         statusBox.value = `已打开材料：${localMaterial.title || '既往检查材料'}`;
         renderTests();
         return;
@@ -2233,6 +2305,9 @@ ${escapeHtml(score.nextGoal)}
       isLoading = false;
       isTestRunning = false;
       conversationHistory = [];
+      researchSessionId = '';
+      researchEventIndex = 0;
+      researchSessionStartedAt = '';
       dialogueState = createDialogueState();
       lastLocalReply = '';
       surfacedMaterialIds = [];
@@ -2243,6 +2318,14 @@ ${escapeHtml(score.nextGoal)}
       appendMessage('system', `${groupName.value || '未命名小组'} 已进入 ${selectedCase.displayName || selectedCase.title}`);
       appendMessage('patient', selectedCase.opening);
       conversationHistory.push({ role: 'patient', content: selectedCase.opening });
+      researchSessionId = createResearchSessionId();
+      researchEventIndex = 0;
+      researchSessionStartedAt = new Date().toISOString();
+      logResearchEvent('session_start', {
+        opening: selectedCase.opening,
+        caseDisplayName: selectedCase.displayName || selectedCase.title || '',
+        consultationRoundLabel: groupName.value || '?????'
+      });
 
       statusBox.value = '问诊已开始，可发送消息。';
       currentModeBox.value = `当前预设模式：${modeSelect.value}`;
@@ -2284,6 +2367,7 @@ ${escapeHtml(score.nextGoal)}
 
       appendMessage('student', text);
       conversationHistory.push({ role: 'student', content: text });
+      logResearchEvent('student_message', { message: text, messageLength: text.length });
       updateDialogueStateFromStudent(text);
       messageInput.value = '';
 
@@ -2292,6 +2376,7 @@ ${escapeHtml(score.nextGoal)}
         const patientReply = generateLocalPatientReply(getLocalCase(caseSelect.value), text);
         appendMessage('patient', patientReply);
         conversationHistory.push({ role: 'patient', content: patientReply });
+        logResearchEvent('patient_reply', { reply: patientReply, source: 'local-static' });
         maybeShowLocalMaterialCard(caseSelect.value, text);
         localModeActive = true;
         statusBox.value = endpoint ? '已使用前端本地患者回复。' : '后端地址为空，已使用前端本地患者回复。';
@@ -2332,6 +2417,11 @@ ${escapeHtml(score.nextGoal)}
 
         appendMessage('patient', patientReply);
         conversationHistory.push({ role: 'patient', content: patientReply });
+        logResearchEvent('patient_reply', {
+          reply: patientReply,
+          source: returnedMode,
+          extraCardsCount: Array.isArray(data.extraCards) ? data.extraCards.length : 0
+        });
 
         if (Array.isArray(data.extraCards) && data.extraCards.length > 0) {
           data.extraCards.forEach(card => {
@@ -2454,6 +2544,14 @@ ${escapeHtml(score.nextGoal)}
 
         completedTests = Array.isArray(data.completedTests) ? data.completedTests : completedTests;
         currentTestResult = data;
+        logResearchEvent('test_run', {
+          testId,
+          testName: data.testName || testItem.name,
+          resultTitle: data.resultTitle || '',
+          resultText: data.resultText || '',
+          teachingValue: data.teachingValue || '',
+          source: localModeActive || !chatUrl ? 'local-static' : 'backend'
+        });
         conversationHistory.push({
           role: 'system',
           content: `已完成检查：${data.testName || testItem.name}\n检查结果：${data.resultText || ''}`
@@ -2478,6 +2576,15 @@ ${escapeHtml(score.nextGoal)}
         if (data.ok) {
           completedTests = data.completedTests;
           currentTestResult = data;
+          logResearchEvent('test_run', {
+            testId,
+            testName: data.testName || testItem.name,
+            resultTitle: data.resultTitle || '',
+            resultText: data.resultText || '',
+            teachingValue: data.teachingValue || '',
+            source: 'local-after-test-error',
+            error: error.message
+          });
           conversationHistory.push({
             role: 'system',
             content: `已完成检查：${data.testName || testItem.name}\n检查结果：${data.resultText || ''}`
@@ -2554,7 +2661,16 @@ ${escapeHtml(score.nextGoal)}
       consultationEnded = true;
       setChatControlsDisabled(true);
       renderTests();
-      renderLocalScore();
+      const finalScore = renderLocalScore();
+      logResearchEvent('final_score', {
+        score: finalScore,
+        completedTests: [...completedTests],
+        viewedMaterialIds: [...viewedMaterialIds],
+        dialogueState: { ...dialogueState },
+        conversationHistory: [...conversationHistory],
+        startedAt: researchSessionStartedAt,
+        endedAt: new Date().toISOString()
+      });
       statusBox.value = `本轮问诊已结束，共记录 ${conversationHistory.length} 条对话。`;
       appendMessage('system', '本轮问诊已结束。右侧已生成五维评分反馈，可继续查看已完成检查结果。');
     }

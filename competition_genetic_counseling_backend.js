@@ -2,12 +2,14 @@ const express = require('express');
 const cors = require('cors');
 const OpenAI = require('openai');
 const path = require('path');
+const https = require('https');
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
-app.use(express.json({ limit: '1mb' }));
+app.use(express.json({ limit: '5mb' }));
 app.use(express.static(__dirname));
 
 /**
@@ -35,6 +37,108 @@ const client = process.env.DEEPSEEK_API_KEY
 
 const DEFAULT_MODE = process.env.CHAT_MODE || 'ai';
 const MODEL_NAME = process.env.DEEPSEEK_MODEL || 'deepseek-chat';
+const RESEARCH_LOGGING_ENABLED = process.env.RESEARCH_LOGGING !== 'false';
+const RESEARCH_LOG_DIR = process.env.RESEARCH_LOG_DIR || path.join(__dirname, 'research_logs');
+const SUPABASE_URL = (process.env.SUPABASE_URL || '').replace(/\/$/, '');
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const SUPABASE_RESEARCH_TABLE = process.env.SUPABASE_RESEARCH_TABLE || 'research_events';
+
+function ensureResearchLogDir() {
+  if (!fs.existsSync(RESEARCH_LOG_DIR)) {
+    fs.mkdirSync(RESEARCH_LOG_DIR, { recursive: true });
+  }
+}
+
+function sanitizeResearchText(value, maxLength) {
+  const text = String(value || '').replace(/[\r\n\t]+/g, ' ').trim();
+  return text.slice(0, maxLength || 500);
+}
+
+function isSupabaseResearchConfigured() {
+  return Boolean(SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY);
+}
+
+function postResearchEventToSupabase(record) {
+  return new Promise((resolve) => {
+    if (!isSupabaseResearchConfigured()) {
+      return resolve({ ok: false, skipped: true, error: 'Supabase is not configured.' });
+    }
+
+    let endpoint;
+    try {
+      endpoint = new URL(SUPABASE_URL + '/rest/v1/' + encodeURIComponent(SUPABASE_RESEARCH_TABLE));
+    } catch (error) {
+      return resolve({ ok: false, skipped: false, error: error.message });
+    }
+
+    const row = {
+      timestamp: record.timestamp,
+      session_id: record.sessionId,
+      group_name: record.groupName,
+      case_id: record.caseId,
+      case_title: record.caseTitle,
+      event_type: record.eventType,
+      client_mode: record.clientMode,
+      payload: record.payload || {}
+    };
+
+    const body = JSON.stringify(row);
+    const options = {
+      method: 'POST',
+      hostname: endpoint.hostname,
+      path: endpoint.pathname + endpoint.search,
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(body),
+        'apikey': SUPABASE_SERVICE_ROLE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_SERVICE_ROLE_KEY,
+        'Prefer': 'return=minimal'
+      }
+    };
+
+    const req = https.request(options, (res) => {
+      let responseText = '';
+      res.on('data', (chunk) => { responseText += chunk.toString(); });
+      res.on('end', () => {
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          resolve({ ok: true, statusCode: res.statusCode });
+        } else {
+          resolve({ ok: false, statusCode: res.statusCode, error: responseText.slice(0, 500) });
+        }
+      });
+    });
+
+    req.on('error', (error) => resolve({ ok: false, error: error.message }));
+    req.setTimeout(5000, () => {
+      req.destroy(new Error('Supabase request timeout'));
+    });
+    req.write(body);
+    req.end();
+  });
+}
+
+function appendResearchEvent(event) {
+  if (!RESEARCH_LOGGING_ENABLED) {
+    return null;
+  }
+
+  ensureResearchLogDir();
+  const now = new Date();
+  const day = now.toISOString().slice(0, 10);
+  const record = {
+    timestamp: now.toISOString(),
+    sessionId: sanitizeResearchText(event.sessionId, 120),
+    groupName: sanitizeResearchText(event.groupName, 80) || '未命名小组',
+    caseId: sanitizeResearchText(event.caseId, 40),
+    caseTitle: sanitizeResearchText(event.caseTitle, 160),
+    eventType: sanitizeResearchText(event.eventType, 60),
+    clientMode: sanitizeResearchText(event.clientMode, 60),
+    payload: event.payload || {}
+  };
+  const filePath = path.join(RESEARCH_LOG_DIR, `research_events_${day}.jsonl`);
+  fs.appendFileSync(filePath, JSON.stringify(record) + '\n', 'utf8');
+  return record;
+}
 
 const FRONTEND_CASE_PRESENTATION = {
   case1: {
@@ -5024,6 +5128,53 @@ app.post('/api/materials/view', (req, res) => {
     console.error('查看材料失败：', error);
     res.status(500).json({
       error: '查看材料失败',
+      detail: error.message
+    });
+  }
+});
+
+app.get('/api/research/status', (req, res) => {
+  const supabaseConfigured = isSupabaseResearchConfigured();
+  res.json({
+    ok: true,
+    enabled: RESEARCH_LOGGING_ENABLED,
+    storage: supabaseConfigured ? 'jsonl+supabase' : 'jsonl',
+    supabaseConfigured,
+    supabaseTable: SUPABASE_RESEARCH_TABLE,
+    note: RESEARCH_LOGGING_ENABLED
+      ? (supabaseConfigured ? 'Research logging enabled: JSONL + Supabase.' : 'Research logging enabled: local JSONL only.')
+      : 'Research logging disabled.'
+  });
+});
+
+app.post('/api/research/event', async (req, res) => {
+  try {
+    const payload = req.body || {};
+    const record = appendResearchEvent(payload);
+    let supabaseResult = { ok: false, skipped: true };
+
+    if (record) {
+      supabaseResult = await postResearchEventToSupabase(record);
+      if (!supabaseResult.ok && !supabaseResult.skipped) {
+        console.warn('Failed to write research log to Supabase:', supabaseResult.error || supabaseResult.statusCode);
+      }
+    }
+
+    res.json({
+      ok: true,
+      saved: Boolean(record),
+      savedLocal: Boolean(record),
+      savedSupabase: Boolean(supabaseResult.ok),
+      supabaseConfigured: isSupabaseResearchConfigured(),
+      supabaseTable: SUPABASE_RESEARCH_TABLE,
+      timestamp: record ? record.timestamp : new Date().toISOString(),
+      supabaseError: supabaseResult.ok || supabaseResult.skipped ? '' : (supabaseResult.error || String(supabaseResult.statusCode || ''))
+    });
+  } catch (error) {
+    console.error('???????????', error);
+    res.status(500).json({
+      ok: false,
+      error: '??????????',
       detail: error.message
     });
   }
