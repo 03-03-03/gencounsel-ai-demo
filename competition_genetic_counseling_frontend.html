@@ -1492,17 +1492,139 @@
       const allText = conversationHistory.map(item => item.content || '').join('\n');
       const q = normalizeText(allText);
       const selectedCaseId = caseSelect.value;
-      const isDown = selectedCaseId === 'case4';
-      const hasReview = completedTests.includes('case4_review_reports');
-      const hasUltrasound = completedTests.includes('case4_ultrasound');
-      const hasAmnio = completedTests.includes('case4_amniocentesis_karyotype');
-      const hasDistractor = completedTests.includes('case4_couple_karyotype');
-      const hasScreeningExplanation =
-        dialogueState.explainedScreeningNotDiagnosis ||
-        includesAny(q, ['筛查不是诊断', '筛查不能确诊']);
-      const hasNiptExplanation =
-        dialogueState.explainedNiptNotDiagnosis ||
-        includesAny(q, ['nipt不是诊断', '无创不是诊断', '风险评估']);
+      const profiles = {
+        case1: {
+          conceptTerms: ['血友病', '血友病a', 'f8', '凝血因子viii', '八因子', 'x连锁', '携带者', '男性发病', '产前诊断', '胚胎植入前'],
+          keyTests: ['case1_record', 'case1_f8'],
+          supportiveTests: ['case1_coagulation'],
+          distractorTests: ['case1_karyotype'],
+          pathwayName: '先复核患病亲属资料，再进行家系变异针对性检测和携带者风险评估',
+          diagnosisName: '血友病A携带者风险及X连锁遗传咨询',
+          testStrength: '检查路径能围绕患病亲属资料复核、F8家系变异检测和凝血表型评估展开。',
+          conceptStrength: '能抓住血友病A、F8基因和X连锁遗传的核心医学边界。',
+          missingConcept: '尚需更明确说明血友病A常见为X连锁遗传，女性可为携带者且表型可不明显。',
+          missingPathway: '建议先确认家族中患病者诊断和致病变异，再评估本人携带者状态。',
+          sample: '可以这样表达：您家族中的出血问题需要先看患病亲属的病历和凝血因子结果，如果确认为血友病A，再针对家系中的F8变异判断您是否为携带者。若您是携带者，将来生育时儿子有患病风险、女儿有携带风险，我们可以在充分知情后讨论产前诊断或胚胎植入前遗传学检测等选择。',
+          nextGoal: '下次训练目标：在2分钟内完成“家族史追问、患病亲属资料复核、携带者检测、生育风险解释、可选生育方案”五步说明。'
+        },
+        case2: {
+          conceptTerms: ['地中海贫血', '地贫', '小细胞', '低色素', 'mcv', 'mch', '基因检测', '双方携带', '重型地贫', '25%', '产前诊断'],
+          keyTests: ['case2_blood', 'case2_gene'],
+          supportiveTests: ['case2_iron'],
+          distractorTests: ['case2_liver'],
+          pathwayName: '血液学筛查、铁代谢鉴别和夫妻双方地贫基因检测',
+          diagnosisName: '夫妻双方地中海贫血携带与后代重型地贫风险咨询',
+          testStrength: '检查路径能从红细胞指数复核进入夫妻双方地贫基因检测，并注意与缺铁性贫血鉴别。',
+          conceptStrength: '能围绕地中海贫血携带、夫妻同型携带和后代风险进行解释。',
+          missingConcept: '尚需说明小细胞低色素只是提示线索，最终风险要依赖夫妻双方基因型判断。',
+          missingPathway: '建议补充夫妻双方地贫基因检测，并根据基因型讨论产前诊断或辅助生殖选择。',
+          sample: '可以这样表达：您和伴侣的红细胞指数异常提示可能存在地中海贫血携带，但不能只凭血常规下结论。建议双方做地贫基因检测，若双方携带同一类型相关变异，后代可能有重型地贫风险，可进一步讨论产前诊断、胚胎植入前检测或其他生育选择。',
+          nextGoal: '下次训练目标：完成“血常规线索、鉴别缺铁、双方基因检测、后代风险、产前诊断选择”五步咨询。'
+        },
+        case3: {
+          conceptTerms: ['反复流产', '自然流产', '夫妻核型', '平衡易位', '染色体结构异常', '流产组织', '胚胎染色体', 'pgt', '产前诊断'],
+          keyTests: ['case3_couple_karyotype'],
+          supportiveTests: ['case3_products', 'case3_ultrasound'],
+          distractorTests: ['case3_blood'],
+          pathwayName: '夫妻核型分析、流产组织遗传学检测和非遗传因素综合评估',
+          diagnosisName: '反复早孕流产中的染色体结构异常风险咨询',
+          testStrength: '检查路径能把夫妻双方核型分析作为反复流产遗传学评估的关键步骤。',
+          conceptStrength: '能认识到父母平衡易位等染色体结构异常可导致反复流产。',
+          missingConcept: '尚需说明反复流产是多因素问题，父母核型、胚胎染色体和子宫/内分泌等因素需综合判断。',
+          missingPathway: '建议补充夫妻双方核型分析，并提醒后续若再次流产应尽量保留组织做遗传学检测。',
+          sample: '可以这样表达：反复早孕流产可能与胚胎染色体异常、父母平衡易位、子宫结构或内分泌免疫等因素有关。遗传学上建议先做夫妻双方外周血染色体核型分析，若发现平衡易位，再讨论自然妊娠后的产前诊断、胚胎植入前遗传学检测等选择。',
+          nextGoal: '下次训练目标：在问诊中同时覆盖流产次数孕周、既往胚胎资料、夫妻核型和下一次妊娠管理。'
+        },
+        case4: {
+          conceptTerms: ['筛查不是诊断', '筛查不能确诊', '高风险不等于确诊', 'nipt不是诊断', '无创不是诊断', '风险评估', '21三体', '羊水穿刺', '核型分析', '产前诊断'],
+          keyTests: ['case4_review_reports', 'case4_amniocentesis_karyotype'],
+          supportiveTests: ['case4_ultrasound'],
+          distractorTests: ['case4_couple_karyotype'],
+          pathwayName: '复核筛查报告、系统超声和羊水穿刺胎儿染色体核型分析',
+          diagnosisName: '21三体筛查高风险后的产前诊断咨询',
+          testStrength: '检查路径较合理，能把羊水穿刺和胎儿染色体核型分析作为确诊关键。',
+          conceptStrength: '能区分筛查、风险评估与诊断，医学边界较清楚。',
+          missingConcept: '尚需明确说明“筛查不是诊断，高风险不等于确诊，NIPT仍属于风险评估”。',
+          missingPathway: '建议提出羊水穿刺胎儿染色体核型分析，并说明其目的、收益、风险和局限。',
+          sample: '可以这样表达：您现在看到的是筛查高风险，不等于已经确诊；NIPT也仍是风险评估。下一步建议在充分知情同意后考虑羊水穿刺，进行胎儿染色体核型分析来明确诊断。无论后续结果如何，我们都会把信息、风险和可选方案讲清楚，由您和家属自主决定。',
+          nextGoal: '下次训练目标：在2分钟内完成“共情安抚、筛查与诊断区分、产前诊断路径、知情同意与自主选择”四步说明。'
+        },
+        case5: {
+          conceptTerms: ['turner', '特纳', '45,x', '45，x', '核型', '原发闭经', '身材矮小', '性腺发育', '心脏', '肾脏', '生育力'],
+          keyTests: ['case5_karyotype'],
+          supportiveTests: ['case5_ultrasound', 'case5_heart'],
+          distractorTests: ['case5_metabolic'],
+          pathwayName: '外周血染色体核型分析、盆腔超声和心肾并发症评估',
+          diagnosisName: 'Turner综合征相关诊断和长期健康管理咨询',
+          testStrength: '检查路径能把染色体核型分析作为明确Turner综合征的关键，并兼顾盆腔和心肾评估。',
+          conceptStrength: '能将原发闭经、身材矮小与性染色体异常和系统健康管理联系起来。',
+          missingConcept: '尚需说明Turner综合征不仅影响月经和身高，也涉及心血管、肾脏、内分泌和生育力管理。',
+          missingPathway: '建议优先选择染色体核型分析，并补充盆腔超声及心肾结构评估。',
+          sample: '可以这样表达：您的原发闭经和身材矮小提示需要考虑性染色体相关原因。建议先做外周血染色体核型分析，如果支持Turner综合征，还需要评估卵巢和子宫发育、心脏和肾脏结构，并讨论身高、青春期发育、生育力和长期随访管理。',
+          nextGoal: '下次训练目标：完成“症状解释、核型确诊、并发症筛查、生育力与长期管理”四步咨询。'
+        },
+        case6: {
+          conceptTerms: ['huntington', '亨廷顿', 'htt', 'cag', '常染色体显性', '成人发病', '预测性检测', '心理评估', '知情同意', '不检测权利'],
+          keyTests: ['case6_father_record'],
+          supportiveTests: ['case6_predictive', 'case6_psych'],
+          distractorTests: ['case6_ct'],
+          pathwayName: '先复核父亲诊断和HTT变异，再进行预测性检测前咨询与心理评估',
+          diagnosisName: 'Huntington病家系中的成人预测性检测伦理咨询',
+          testStrength: '检查路径能先确认家系诊断，再谨慎讨论本人预测性检测和心理支持。',
+          conceptStrength: '能注意成人发病遗传病预测性检测的自主性、心理风险和伦理边界。',
+          missingConcept: '尚需强调预测性检测不是普通体检，应尊重来访者知情同意、不检测权利和心理承受能力。',
+          missingPathway: '建议先复核父亲外院资料和家系致病变异，再安排检测前遗传咨询与心理评估。',
+          sample: '可以这样表达：在您本人没有症状时，是否做Huntington病预测性检测需要非常慎重。第一步是确认父亲的诊断和HTT CAG重复扩增结果；第二步是在充分遗传咨询、心理评估和知情同意后，由您自主决定是否检测，也包括暂时不检测的权利。',
+          nextGoal: '下次训练目标：完成“家系诊断确认、遗传方式解释、预测性检测伦理、心理支持、生育选择”五步说明。'
+        },
+        case7: {
+          conceptTerms: ['唇腭裂', '多因素', '再发风险', '综合征性', '非综合征性', '叶酸', '孕前', '目标超声', '环境因素', '遗传咨询'],
+          keyTests: ['case7_child_record'],
+          supportiveTests: ['case7_ultrasound', 'case7_panel'],
+          distractorTests: ['case7_blood'],
+          pathwayName: '复核患儿表型资料，区分综合征性与非综合征性，再讨论再发风险和孕期筛查',
+          diagnosisName: '非综合征性唇腭裂倾向的多因素再发风险咨询',
+          testStrength: '检查路径能先复核患儿表型，再决定是否需要进一步遗传检测和孕期目标超声。',
+          conceptStrength: '能认识唇腭裂常涉及多因素遗传和环境因素，再发风险不能简单归为单基因病。',
+          missingConcept: '尚需区分综合征性和非综合征性唇腭裂，并说明再发风险是概率评估而非绝对预测。',
+          missingPathway: '建议先复核患儿病历和表型资料，孕前做好风险因素管理，孕期进行目标超声评估。',
+          sample: '可以这样表达：孩子的唇腭裂需要先判断是否有其他畸形或发育异常。如果目前更像非综合征性唇腭裂，通常属于多因素风险，下一胎风险会比普通人群升高但不是一定再发。建议复核孩子资料，孕前补充叶酸并减少可干预风险因素，孕期做针对颜面结构的目标超声。',
+          nextGoal: '下次训练目标：完成“患儿表型复核、综合征性判断、多因素风险解释、孕前孕期管理”四步咨询。'
+        },
+        case8: {
+          conceptTerms: ['lhon', 'leber', '线粒体', 'mtdna', '母系遗传', '视神经', '外显率', '男性更易', '家系', '遗传检测'],
+          keyTests: ['case8_mtdna', 'case8_eye'],
+          supportiveTests: ['case8_maternal'],
+          distractorTests: ['case8_karyotype'],
+          pathwayName: '眼科专科评估、线粒体DNA检测和母系家系风险评估',
+          diagnosisName: 'LHON相关线粒体遗传咨询',
+          testStrength: '检查路径能结合眼科表型、线粒体DNA检测和母系家系资料进行判断。',
+          conceptStrength: '能把青年视力下降与LHON、线粒体DNA变异和母系遗传联系起来。',
+          missingConcept: '尚需说明LHON通常与线粒体DNA变异相关，风险评估重点关注母系亲属且存在外显率差异。',
+          missingPathway: '建议优先选择眼科专科评估和线粒体DNA检测，而不是常规染色体核型分析。',
+          sample: '可以这样表达：您的视神经受累和年轻发病特点提示需要考虑LHON。建议结合眼科专科评估和线粒体DNA相关变异检测来确认诊断；如果支持LHON，家族风险主要按母系传递来评估，但是否发病还受外显率、性别和环境因素影响。',
+          nextGoal: '下次训练目标：完成“眼科表型确认、mtDNA检测、母系遗传解释、亲属风险和生活建议”四步咨询。'
+        },
+        case9: {
+          conceptTerms: ['klinefelter', '克氏', '克莱恩费尔特', '47,xxy', '47，xxy', '核型', '无精', '少精', '性激素', '睾酮', '辅助生殖'],
+          keyTests: ['case9_karyotype'],
+          supportiveTests: ['case9_semen', 'case9_hormone'],
+          distractorTests: ['case9_partner'],
+          pathwayName: '男方精液分析、性激素检测和外周血染色体核型分析',
+          diagnosisName: 'Klinefelter综合征相关男性不育遗传咨询',
+          testStrength: '检查路径能围绕男方精液异常、性激素水平和染色体核型分析展开。',
+          conceptStrength: '能把男性不育、精液异常和47,XXY等性染色体异常联系起来。',
+          missingConcept: '尚需说明Klinefelter综合征可导致睾丸功能异常、无精或严重少精，并涉及内分泌和生殖医学管理。',
+          missingPathway: '建议优先完善男方染色体核型分析、精液复核和性激素水平评估。',
+          sample: '可以这样表达：您目前的核心线索在男方精液异常，因此需要复核精液分析、评估性激素，并做外周血染色体核型分析。如果结果提示47,XXY，支持Klinefelter综合征，后续要结合男科和生殖医学评估是否有取精和辅助生殖机会，同时关注睾酮和长期健康管理。',
+          nextGoal: '下次训练目标：完成“男方不育线索、核型确诊、内分泌评估、生殖医学转诊和遗传风险解释”五步咨询。'
+        }
+      };
+      const profile = profiles[selectedCaseId] || profiles.case4;
+      const termHits = profile.conceptTerms.filter(term => q.includes(normalizeText(term))).length;
+      const keyHits = profile.keyTests.filter(testId => completedTests.includes(testId)).length;
+      const supportiveHits = profile.supportiveTests.filter(testId => completedTests.includes(testId)).length;
+      const distractorHits = profile.distractorTests.filter(testId => completedTests.includes(testId)).length;
       const hasAnxietyResponse =
         dialogueState.addressedAnxiety ||
         includesAny(q, ['理解您', '焦虑', '紧张', '害怕', '担心']);
@@ -1510,19 +1632,17 @@
         dialogueState.mentionedConsent &&
         dialogueState.respectedAutonomy;
 
-      let medical = 12;
-      if (hasScreeningExplanation) medical += 7;
-      if (dialogueState.explainedHighRiskNotConfirmed || includesAny(q, ['高风险不等于确诊', '不是确诊'])) medical += 6;
-      if (hasNiptExplanation) medical += 5;
+      let medical = 12 + Math.min(termHits, 5) * 3;
+      if (keyHits >= 1) medical += 2;
+      if (keyHits >= profile.keyTests.length) medical += 2;
+      if (selectedCaseId === 'case4' && dialogueState.explainedHighRiskNotConfirmed) medical += 2;
       medical = Math.min(30, medical);
 
       let pathway = 8 + Math.min(completedTests.length, 3) * 3;
-      if (isDown && hasReview) pathway += 4;
-      if (isDown && hasUltrasound) pathway += 3;
-      if (isDown && hasAmnio) pathway += 8;
-      if (isDown && hasDistractor && !hasAmnio) pathway -= 4;
-      if (dialogueState.mentionedAmniocentesis) pathway += 2;
-      if (dialogueState.mentionedKaryotype || dialogueState.mentionedPrenatalDiagnosis) pathway += 2;
+      pathway += keyHits * 5 + supportiveHits * 2;
+      if (keyHits === 0 && distractorHits > 0) pathway -= 4;
+      if (selectedCaseId === 'case4' && dialogueState.mentionedAmniocentesis) pathway += 2;
+      if (dialogueState.mentionedKaryotype || dialogueState.mentionedPrenatalDiagnosis) pathway += 1;
       pathway = Math.max(0, Math.min(25, pathway));
 
       let empathy = 8;
@@ -1533,8 +1653,8 @@
       let ethics = 5;
       if (dialogueState.mentionedConsent) ethics += 5;
       if (dialogueState.respectedAutonomy) ethics += 4;
-      if (dialogueState.avoidedDirectTermination) ethics += 4;
-      if (!dialogueState.avoidedDirectTermination) ethics -= 5;
+      if (selectedCaseId === 'case4' && dialogueState.avoidedDirectTermination) ethics += 4;
+      if (selectedCaseId === 'case4' && !dialogueState.avoidedDirectTermination) ethics -= 5;
       ethics = Math.max(0, Math.min(15, ethics));
 
       let language = 6;
@@ -1547,21 +1667,20 @@
       const gaps = [];
       const suggestions = [];
 
-      if (medical >= 24) strengths.push('能区分筛查、风险评估与诊断，医学边界较清楚。');
-      if (pathway >= 20) strengths.push('检查路径较合理，能把羊水穿刺和胎儿染色体核型分析作为确诊关键。');
+      if (medical >= 24) strengths.push(profile.conceptStrength);
+      if (pathway >= 20) strengths.push(profile.testStrength);
       if (empathy >= 16) strengths.push('能回应患者焦虑，沟通语气较稳定。');
       if (ethics >= 12) strengths.push('体现知情同意和自主选择，未直接替患者做决定。');
 
-      if (!hasScreeningExplanation) gaps.push('尚未明确说明“筛查不是诊断”。');
-      if (!hasNiptExplanation) gaps.push('NIPT仍属于风险评估这一点不够突出。');
-      if (isDown && !hasAmnio && !dialogueState.mentionedAmniocentesis) gaps.push('未充分提出羊水穿刺和胎儿染色体核型分析。');
+      if (termHits < 2) gaps.push(profile.missingConcept);
+      if (keyHits === 0) gaps.push(profile.missingPathway);
       if (!hasAnxietyResponse) gaps.push('对患者焦虑的回应不足。');
       if (!hasConsentAndAutonomy) gaps.push('知情同意和自主选择表达还可加强。');
-      if (!dialogueState.avoidedDirectTermination) gaps.push('出现了过早或直接建议终止妊娠的表达，需要避免。');
+      if (selectedCaseId === 'case4' && !dialogueState.avoidedDirectTermination) gaps.push('出现了过早或直接建议终止妊娠的表达，需要避免。');
 
-      suggestions.push('先安抚情绪，再解释报告性质，最后给出下一步诊断路径。');
-      suggestions.push('说明羊水穿刺的目的、收益、风险和局限，并确认患者理解。');
-      suggestions.push('对终止妊娠相关问题保持中立，基于确诊结果和患者价值观进行支持性咨询。');
+      suggestions.push(`先回应患者担忧，再围绕“${profile.diagnosisName}”解释医学判断依据。`);
+      suggestions.push(`检查路径建议按“${profile.pathwayName}”组织，避免被干扰项带偏。`);
+      suggestions.push('说明检查或干预的目的、收益、风险和局限，并确认患者理解后再讨论下一步。');
 
       return {
         total,
@@ -1569,8 +1688,8 @@
         strengths: strengths.length ? strengths : ['已完成基本问诊流程，能够围绕患者主要担忧展开。'],
         gaps: gaps.length ? gaps : ['整体要点较完整，可继续提高表达的结构化程度。'],
         suggestions,
-        sample: '可以这样表达：您现在看到的是筛查高风险，不等于已经确诊；NIPT也仍是风险评估。下一步建议在充分知情同意后考虑羊水穿刺，进行胎儿染色体核型分析来明确诊断。无论后续结果如何，我们都会把信息、风险和可选方案讲清楚，由您和家属自主决定。',
-        nextGoal: '下次训练目标：在2分钟内完成“共情安抚、筛查与诊断区分、产前诊断路径、知情同意与自主选择”四步说明。'
+        sample: profile.sample,
+        nextGoal: profile.nextGoal
       };
     }
 
