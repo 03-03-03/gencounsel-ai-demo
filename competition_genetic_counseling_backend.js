@@ -200,10 +200,10 @@ const FRONTEND_CASE_PRESENTATION = {
 
 const FRONTEND_TEST_NAME_OVERRIDES = {
   case1: {
-    test_patient_targeted_genetic: '患者凝血相关家系变异针对性检测'
+    test_patient_targeted_genetic: '患者本人F8家系致病变异针对性检测'
   },
   case2: {
-    test_both_thal_gene: '夫妻双方小细胞贫血相关遗传检测'
+    test_both_thal_gene: '夫妻双方HBB基因变异检测'
   },
   case6: {
     test_case6_father_record: '父亲外院神经系统疾病资料复核',
@@ -230,7 +230,7 @@ const TEACHING_TEST_OVERRIDES = {
     },
     {
       testId: 'case5_pelvic_ultrasound',
-      name: '盆腔超声',
+      name: '盆腔超声评估子宫和卵巢发育',
       type: 'laboratory',
       available: true,
       allowRepeat: false,
@@ -242,7 +242,7 @@ const TEACHING_TEST_OVERRIDES = {
     },
     {
       testId: 'case5_heart_kidney',
-      name: '心脏及肾脏结构评估',
+      name: '心脏超声和肾脏超声筛查',
       type: 'laboratory',
       available: true,
       allowRepeat: false,
@@ -538,12 +538,12 @@ const CASE_LIBRARY = {
 
     chiefConcern: '患者担心母系家族中的出血病会不会与遗传有关，并影响自己未来生育。',
 
-    background: '患者母亲的弟弟（患者舅舅）曾被诊断为血友病A，患者舅舅的儿子也患有类似疾病。患者本人无明显异常出血史，但因即将结婚，开始担心自己是否可能为携带者及其对子代的影响。',
+    background: '患者母亲的弟弟（患者舅舅）曾被诊断为血友病A，患者母系家族另一位女性亲属的儿子也有类似出血表现。患者本人无明显异常出血史，但因即将结婚，开始担心自己是否可能为携带者及其对子代的影响。',
 
     familyHistory: [
       '患者母亲的弟弟（患者舅舅）自幼有反复出血史。',
       '患者舅舅后来被诊断为血友病A。',
-      '患者舅舅的儿子也患有类似疾病。',
+      '患者母系家族另一位女性亲属的儿子也有类似出血表现。',
       '患者母亲本人无明显异常出血表现。',
       '患者本人目前无明显异常出血史。',
       '未婚夫家族中目前未听说类似出血病史。'
@@ -579,7 +579,7 @@ const CASE_LIBRARY = {
 
     hiddenInfo: [
       '如果学生进一步追问有没有明确诊断，回答：后来医院好像说是血友病，具体像是血友病A。',
-      '如果学生问还有没有别人也这样，回答：我舅舅家的儿子也有这个病，小时候家里对他就挺小心的。',
+      '如果学生问还有没有别人也这样，回答：我妈说她们家那边还有一位女性亲属的儿子也有类似出血问题，小时候家里对他就挺小心的。',
       '如果学生问妈妈有没有问题，回答：我妈妈自己倒没有明显这种情况。',
       '如果学生问本人有没有异常出血，回答：我自己平时倒没觉得有什么特别明显的问题，拔牙、来月经这些也都还行。',
       '如果学生问未婚夫家里有没有类似情况，回答：他家里目前没听说过这种病。',
@@ -618,28 +618,28 @@ const CASE_LIBRARY = {
     tests: [
       {
         testId: 'test_uncle_record',
-        name: '获取患病亲属既往资料',
+        name: '获取患病亲属病历及F8变异报告',
         type: 'information',
         available: true,
         recommendedPriority: 1,
         allowRepeat: false,
         prerequisites: [],
-        resultTitle: '患病亲属既往资料',
-        resultText: '既往资料提示：患者舅舅凝血因子Ⅷ活性明显降低，结合临床表现诊断为血友病A。',
-        teachingValue: '明确患病亲属的具体病种，避免仅凭模糊病史推断。',
-        interpretationHint: '该结果可进一步支持当前家系属于血友病A相关家系。'
+        resultTitle: '患病亲属病历及F8变异报告',
+        resultText: '既往资料提示：患者舅舅凝血因子Ⅷ活性明显降低，结合临床表现诊断为血友病A；补充基因报告显示该家系存在F8致病变异。',
+        teachingValue: '明确患病亲属的具体病种和家系致病变异，避免仅凭模糊病史推断。',
+        interpretationHint: '该结果支持当前家系属于血友病A相关家系，并为患者本人开展F8家系变异针对性检测提供依据。'
       },
       {
         testId: 'test_patient_bleeding_lab',
-        name: '患者本人相关实验室检查',
+        name: '凝血四项、因子Ⅷ活性及VWF相关检测',
         type: 'laboratory',
         available: true,
         recommendedPriority: 2,
         allowRepeat: false,
         prerequisites: [],
-        resultTitle: '患者本人相关实验室检查结果',
-        resultText: '患者凝血功能基本正常，因子Ⅷ活性处于正常低值范围。',
-        teachingValue: '提示女性携带者可无明显临床异常，单靠该检查不能完全排除携带者身份。',
+        resultTitle: '凝血表型相关检查结果',
+        resultText: 'APTT未见明显延长，因子Ⅷ活性处于正常低值范围，VWF相关指标未见明确异常。',
+        teachingValue: '提示女性携带者可无明显临床异常，凝血表型正常不能单独排除携带者身份。',
         interpretationHint: '该结果可作为辅助信息，但不足以单独完成携带者判断。'
       },
       {
@@ -657,55 +657,55 @@ const CASE_LIBRARY = {
       },
       {
         testId: 'test_patient_targeted_genetic',
-        name: '患者本人针对性遗传检测',
+        name: '患者本人F8家系致病变异针对性检测',
         type: 'genetic',
         available: true,
         recommendedPriority: 4,
         allowRepeat: false,
         prerequisites: ['test_uncle_record'],
-        resultTitle: '患者本人针对性遗传检测结果',
+        resultTitle: '患者本人F8家系变异检测结果',
         resultText: '基因检测发现患者携带F8基因致病变异，为血友病A携带者。',
         teachingValue: '这是本病例最关键的确认性检查之一，用于确认患者是否为携带者。',
         interpretationHint: '若患者为携带者，则后代风险具有明显的性别差异。'
       },
       {
         testId: 'test_patient_cbc',
-        name: '患者本人常规实验室检查',
+        name: '血常规与血小板计数',
         type: 'distractor',
         available: true,
         recommendedPriority: 0,
         allowRepeat: false,
         prerequisites: [],
-        resultTitle: '患者本人常规实验室检查结果',
+        resultTitle: '血常规与血小板计数结果',
         resultText: '血常规未见明显异常，血红蛋白、白细胞及血小板计数基本正常。',
         teachingValue: '这是一个常见但价值有限的选择。',
         interpretationHint: '该检查不能有效回答患者是否为血友病A携带者这一核心问题。'
       },
       {
         testId: 'test_patient_karyotype',
-        name: '患者本人细胞遗传学检查',
+        name: '外周血染色体核型分析',
         type: 'distractor',
         available: true,
         recommendedPriority: 0,
         allowRepeat: false,
         prerequisites: [],
-        resultTitle: '患者本人细胞遗传学检查结果',
+        resultTitle: '外周血染色体核型分析结果',
         resultText: '核型结果为46，XX，未见明显染色体数目或结构异常。',
         teachingValue: '该检查在本病例中方向不够聚焦。',
-        interpretationHint: '当前问题核心在单基因遗传与携带者状态，细胞遗传学检查帮助有限。'
+        interpretationHint: '当前问题核心在单基因遗传与携带者状态，外周血染色体核型分析帮助有限。'
       },
       {
         testId: 'test_patient_broad_genetic',
-        name: '患者本人进一步遗传学评估',
+        name: '非定向扩展遗传检测',
         type: 'distractor',
         available: true,
         recommendedPriority: 0,
         allowRepeat: false,
         prerequisites: ['test_uncle_record'],
-        resultTitle: '患者本人进一步遗传学评估结果',
+        resultTitle: '非定向扩展遗传检测结果',
         resultText: '本次进一步遗传学评估未提供比针对性检测更明确、更直接的临床增益，当前结果对本次咨询推进有限。',
         teachingValue: '提示学生：并不是检测范围越大越合理。',
-        interpretationHint: '在已有明确家系线索时，盲目扩大检测范围容易造成过度检查。'
+        interpretationHint: '在已有明确家系F8变异线索时，优先做针对性检测；盲目扩大检测范围容易造成过度检查和结果解释负担。'
       }
     ],
 
@@ -727,7 +727,7 @@ const CASE_LIBRARY = {
       notes: [
         '本病例中家系结构和亲属关系应主要通过问诊获得，而不是通过“检查”获得。',
         '最关键的客观资料是患病亲属既往资料，以及患者本人针对性遗传检测。',
-        '患者本人相关实验室检查可以辅助判断，但不能替代针对性遗传检测。'
+        '凝血四项、因子Ⅷ活性及VWF相关检测可以辅助判断出血表型，但不能替代F8家系变异针对性检测。'
       ],
       scoringHint: {
         excellent: '选中关键检查，且未选择明显干扰项。',
@@ -756,7 +756,7 @@ const CASE_LIBRARY = {
       keyHistoryPoints: [
         '是否问出母系来源',
         '是否问出舅舅患病',
-        '是否问出舅舅之子也患病',
+        '是否问出母系家族另一名男性亲属也有类似出血表现',
         '是否问出典型出血/关节表现',
         '是否问出患者本人无明显异常',
         '是否问出婚育前咨询需求'
@@ -807,7 +807,7 @@ const CASE_LIBRARY = {
 
     chiefConcern: '患者担心自己和未婚夫的贫血问题会不会与遗传有关，并影响未来生育。',
 
-    background: '患者婚前体检发现小细胞低色素改变，既往一直被说“轻度贫血”，补铁效果不明显。患者来自南方地中海贫血高发地区，其未婚夫体检也提示轻度红细胞指标异常。两人担心是否会影响以后孩子，前来进行婚育前咨询。',
+    background: '患者婚前体检发现小细胞低色素改变，既往一直被说“轻度贫血”，补铁效果不明显。患者来自南方地中海贫血高发地区，其未婚夫体检也提示轻度红细胞指标异常。两人担心是否为地中海贫血携带者以及是否会影响以后孩子，前来进行婚育前咨询。',
 
     familyHistory: [
       '患者自述母亲一直说自己有点贫血。',
@@ -887,16 +887,16 @@ const CASE_LIBRARY = {
     tests: [
       {
         testId: 'test_both_cbc',
-        name: '双方常规血液学检查',
+        name: '双方血常规及红细胞指数复核',
         type: 'laboratory',
         available: true,
         recommendedPriority: 1,
         allowRepeat: false,
         prerequisites: [],
         resultTitle: '双方血常规及红细胞指数结果',
-        resultText: '女方：Hb轻度下降，MCV、MCH降低；男方：Hb基本正常，但MCV、MCH轻度降低。',
+        resultText: '女方：Hb轻度下降，MCV、MCH降低；男方：Hb基本正常，但MCV、MCH轻度降低，提示双方均需进一步进行地中海贫血筛查。',
         teachingValue: '提示双方均存在小细胞低色素线索，为进一步筛查提供依据。',
-        interpretationHint: '该结果可提示存在地中海贫血筛查需求，但不能作为最终诊断依据。'
+        interpretationHint: '该结果可提示地中海贫血携带风险，但不能作为最终诊断依据。'
       },
       {
         testId: 'test_iron_study',
@@ -913,39 +913,39 @@ const CASE_LIBRARY = {
       },
       {
         testId: 'test_hb_analysis',
-        name: '双方血红蛋白相关分析',
+        name: '双方血红蛋白电泳/HbA2定量分析',
         type: 'laboratory',
         available: true,
         recommendedPriority: 3,
         allowRepeat: false,
         prerequisites: ['test_both_cbc'],
-        resultTitle: '双方血红蛋白相关分析结果',
-        resultText: '女方血红蛋白分析提示地中海贫血筛查阳性倾向；男方亦提示异常，需要进一步基因检测。',
-        teachingValue: '进一步支持双方可能存在地中海贫血相关基因改变。',
-        interpretationHint: '若双方筛查均异常，应进一步进行针对性基因检测。'
+        resultTitle: '双方血红蛋白电泳/HbA2定量分析结果',
+        resultText: '双方HbA2均升高，结合小细胞低色素改变，提示β地中海贫血携带可能，需要进一步进行HBB基因检测确认。',
+        teachingValue: 'HbA2升高是β地中海贫血携带者筛查的重要线索，但不能替代基因检测确认。',
+        interpretationHint: '若双方筛查均提示β地中海贫血携带风险，应进一步进行HBB基因检测并评估胎儿风险。'
       },
       {
         testId: 'test_both_thal_gene',
-        name: '双方针对性遗传检测',
+        name: '夫妻双方HBB基因变异检测',
         type: 'genetic',
         available: true,
         recommendedPriority: 4,
         allowRepeat: false,
         prerequisites: ['test_hb_analysis'],
-        resultTitle: '双方针对性遗传检测结果',
-        resultText: '女方：α0地中海贫血杂合子（--/αα）；男方：α+地中海贫血杂合子（-α/αα）。',
-        teachingValue: '这是本病例最关键的确认性检查，用于明确双方基因型并评估子代风险。',
-        interpretationHint: '若双方均为地中海贫血相关基因携带者，则子代风险需根据具体基因组合进行评估。'
+        resultTitle: '夫妻双方HBB基因变异检测结果',
+        resultText: '女方检出HBB基因致病变异，男方亦检出HBB基因致病变异，提示夫妻双方均为β地中海贫血携带者。',
+        teachingValue: '这是本病例最关键的确认性检查，用于明确双方基因型并评估子代重型β地中海贫血风险。',
+        interpretationHint: '若夫妻双方均为β地中海贫血携带者，每次妊娠胎儿有患重型β地中海贫血的风险，应讨论产前诊断、PGT和自主生育决策。'
       },
       {
         testId: 'test_female_karyotype',
-        name: '女方细胞遗传学检查',
+        name: '女方外周血染色体核型分析',
         type: 'distractor',
         available: true,
         recommendedPriority: 0,
         allowRepeat: false,
         prerequisites: ['test_both_cbc'],
-        resultTitle: '女方细胞遗传学检查结果',
+        resultTitle: '女方外周血染色体核型分析结果',
         resultText: '核型结果为46，XX，未见明显染色体数目或结构异常。',
         teachingValue: '该检查在本病例中方向不够聚焦。',
         interpretationHint: '当前问题核心在遗传性血红蛋白病筛查，而非染色体异常。'
@@ -1134,10 +1134,10 @@ const CASE_LIBRARY = {
 `,
 
     tests: [
-      {
-        testId: 'test_couple_karyotype',
-        name: '夫妻双方细胞遗传学检查',
-        type: 'laboratory',
+    {
+      testId: 'test_couple_karyotype',
+      name: '夫妻双方外周血染色体核型分析',
+      type: 'genetic',
         available: true,
         recommendedPriority: 1,
         allowRepeat: false,
@@ -1595,164 +1595,163 @@ case4: {
 
 case5: {
   caseId: 'case5',
-  title: '病例5：胎儿 Turner 综合征风险的产前遗传咨询',
-  shortTitle: 'Turner产前咨询',
-  category: '性染色体异常 / 产前诊断',
+  title: '病例5：原发闭经与身材矮小的 Turner 综合征咨询',
+  shortTitle: 'Turner综合征咨询',
+  category: '性染色体异常 / 青春期发育 / 生育咨询',
   difficulty: '中等',
   status: 'active',
 
   identity: '患者本人',
 
   patientProfile: {
-    name: '刘女士',
-    age: 30,
+    name: '周女士',
+    age: 18,
     gender: '女',
-    occupation: '教师',
-    education: '本科',
-    maritalStatus: '已婚，首胎'
+    occupation: '大学生',
+    education: '高中',
+    maritalStatus: '未婚，原发闭经咨询'
   },
 
-  opening: '医生您好，我现在怀孕了，前面的超声和无创检查都提示胎儿可能有Turner综合征，所以我特别紧张，想来咨询一下。',
+  opening: '医生您好，我一直没有正常来月经，身高也比同龄人矮一些。之前医生说可能需要查染色体，我想弄清楚到底是什么原因。',
 
-  chiefConcern: '患者担心胎儿是否存在 Turner 综合征，并纠结是否需要进一步做确诊性产前诊断。',
+  chiefConcern: '患者因原发闭经、身材矮小和青春期发育不充分前来咨询，担心是否存在染色体相关疾病及以后健康和生育影响。',
 
-  background: '患者当前为宫内单胎妊娠，约18周。孕期超声提示胎儿存在异常征象，随后无创产前检测提示性染色体异常风险升高，医生告知需警惕胎儿 Turner 综合征。患者因此前来进行产前遗传咨询，希望了解现有结果的意义、是否需要进一步确诊以及后续如何决策。',
+  background: '患者18岁，身材较同龄人矮，至今未有规律月经来潮。既往青春期乳房发育不充分，近期妇科检查提示子宫偏小、卵巢显示不清，医生建议进一步进行染色体核型分析。患者希望明确原发闭经和身材矮小的原因，并了解后续健康管理和未来生育问题。',
 
   familyHistory: [
-    '夫妻双方家族中未明确听说过性染色体异常病例。',
-    '家族中未明确听说过类似先天发育异常或反复流产聚集现象。',
+    '父母身高均在正常范围内。',
+    '家族中未明确听说过类似原发闭经、明显身材矮小或性染色体异常病例。',
     '否认近亲婚配。'
   ],
 
   marriageAndBirthHistory: [
-    '患者已婚。',
-    '本次为首次妊娠。',
-    '目前无流产史、无活产史。',
-    '本次来诊主要目的是产前遗传咨询。'
+    '患者未婚，未孕未育。',
+    '至今未有规律月经来潮。',
+    '本次来诊主要目的是明确原发闭经原因和后续管理。'
   ],
 
   previousTests: [
-    '孕期常规检查已完成。',
-    '产前超声提示胎儿存在异常征象。',
-    '无创产前检测提示性染色体异常风险升高，需警惕 Turner 综合征。',
-    '目前尚未进行羊水穿刺等确诊性产前诊断。'
+    '妇科超声提示子宫偏小，双侧卵巢显示不清。',
+    '尚未进行外周血染色体核型分析。',
+    '尚未系统评估心血管、肾脏和内分泌代谢相关风险。',
+    '未做过明确遗传学诊断。'
   ],
 
   activeInfo: [
-    '当前怀孕18周左右。',
-    '超声提示胎儿有异常表现。',
-    '无创进一步提示性染色体异常风险。',
-    '非常担心胎儿到底有没有问题。'
+    '一直没有正常来月经。',
+    '身高比同龄人矮一些。',
+    '青春期发育好像不太充分。',
+    '担心自己是不是有什么染色体问题。'
   ],
 
   followupInfo: [
-    '如果学生问为什么来咨询，回答：因为前面的超声和无创都提示胎儿可能有Turner综合征，所以我特别紧张，想知道到底意味着什么。',
-    '如果学生问孕周，回答：我现在大概怀孕18周左右。',
-    '如果学生问做过什么检查，回答：前面先做了超声，医生说有些地方不太放心，后面又做了无创，结果还是提示有性染色体异常风险。',
-    '如果学生问最担心什么，回答：我最怕的就是孩子真的有问题，但又不敢轻易下结论。',
-    '如果学生问为什么不直接做羊穿，回答：医生提过，但我就是很纠结，既想查清楚，又怕穿刺本身有风险。'
+    '如果学生问为什么来咨询，回答：我一直没有正常来月经，身高也偏矮，妇科医生说可能要查染色体，所以我就来了。',
+    '如果学生问年龄，回答：我今年18岁。',
+    '如果学生问有没有来过月经，回答：没有真正规律来过，只是偶尔有一点点不确定的出血。',
+    '如果学生问青春期发育，回答：我乳房发育好像比同学晚，也不是很明显。',
+    '如果学生问最担心什么，回答：我担心以后是不是不能正常发育，也担心以后能不能结婚生孩子。'
   ],
 
   hiddenInfo: [
-    '如果学生问家族里有没有类似情况，回答：我们两边家里都没有听说过类似的情况。',
-    '如果学生问是不是近亲，回答：不是，我们两家没有亲戚关系。',
-    '如果学生问无创是不是确诊，回答：这也是我现在最想问清楚的地方，我知道它提示风险高，但到底算不算定下来，我自己也搞不明白。',
-    '如果学生问超声具体说了什么，回答：医生提到胎儿有些异常表现，好像和颈部、水肿这些有关，但我自己记不住特别完整。',
-    '如果学生问是否愿意进一步检查，回答：如果确实有必要，我也不是完全拒绝，我就是想先把利弊搞明白。'
+    '如果学生问父母身高，回答：我爸妈身高都还可以，不算特别矮。',
+    '如果学生问既往检查，回答：前面做过妇科超声，医生说子宫偏小，卵巢也看得不太清楚。',
+    '如果学生问有没有心脏或肾脏问题，回答：我没有系统查过，平时也没太注意。',
+    '如果学生问家族里有没有类似情况，回答：没有听说过谁也是一直不来月经或者特别矮。',
+    '如果学生问是不是已经确诊，回答：还没有，医生只是说可能和染色体有关，让我进一步检查。'
   ],
 
   unknownInfo: [
-    '胎儿最终是否患有 Turner 综合征。',
-    '确诊前的最终结论。',
-    '羊穿后核型的具体结果。',
-    '胎儿出生后的临床严重程度。',
-    '精确预后。'
+    '患者最终核型结果。',
+    '是否存在嵌合 Turner 综合征。',
+    '具体卵巢功能储备情况。',
+    '心血管和肾脏是否存在合并异常。',
+    '未来生育可行性和具体方案。'
   ],
 
-  style: '整体焦虑、谨慎，反复确认“高风险是不是就等于有问题”，对羊穿既想做又害怕。',
+  style: '紧张、羞涩但配合，担心自己“不正常”，对月经、身高和未来生育问题比较敏感。',
 
   languageRules: [
-    '不要主动把“无创不是确诊、羊穿才是确诊”一次性全说完。',
-    '不要主动直接说出最终核型结果。',
+    '不要主动把“Turner综合征、45,X/46,XX嵌合、性染色体异常”等标准答案一次性全说完。',
+    '不要主动直接说出最终核型结果或诊断。',
     '学生问得浅，就答得浅；学生问得细，再逐步补充。',
-    '优先使用口语化表达，如“高风险”“无创”“穿刺”“孩子是不是有问题”。',
-    '不知道的内容要明确说不知道，不要编造具体概率或预后。',
+    '优先使用口语化表达，如“一直没来月经”“长得矮一点”“医生说要查染色体”。',
+    '不知道的内容要明确说不知道，不要编造具体激素数值或核型。',
     '不能切换成医生或教师身份解释问题。'
   ],
 
   extraPrompt: `
-你是来求助的孕妇，不是来背答案的。
-第一轮回答时不要主动把“无创不是确诊、需要羊穿确诊、最终结果”等关键信息一次性说完。
+你是来求助的年轻女性患者，不是来背答案的。
+第一轮回答时不要主动把“Turner综合征、核型异常、卵巢功能不全、系统管理”等关键信息一次性说完。
 学生问得浅，你就答得浅；学生问得细，你再逐步补充。
-你不能替学生分析检查层级，也不能主动给出标准答案。
+你不能替学生分析遗传机制，也不能主动给出标准答案。
 每次回答尽量控制在2到4句话，保持真实患者口吻。
 `,
 
   tests: [
     {
-      testId: 'test_case5_ultrasound_report',
-      name: '调取既往产前超声与无创报告',
-      type: 'information',
+      testId: 'test_case5_karyotype',
+      name: '外周血染色体核型分析',
+      type: 'genetic',
       available: true,
       recommendedPriority: 1,
       allowRepeat: false,
       prerequisites: [],
-      resultTitle: '既往产前超声与无创报告结果',
-      resultText: '产前超声提示胎儿异常征象；NIPT提示性染色体异常风险升高，需警惕 Turner 综合征。',
-      teachingValue: '帮助学生理解：现阶段仍主要属于高风险提示，而非最终确诊。',
-      interpretationHint: '该结果提示需进一步考虑确诊性产前诊断。'
+      resultTitle: '外周血染色体核型分析结果',
+      resultText: '核型结果：45,X/46,XX嵌合，支持Turner综合征相关诊断。',
+      teachingValue: '外周血染色体核型分析是明确Turner综合征及嵌合情况的重要检查。',
+      interpretationHint: '该结果可解释原发闭经、身材矮小和青春期发育不充分，需要进一步进行系统健康管理咨询。'
     },
     {
-      testId: 'test_case5_targeted_ultrasound',
-      name: '胎儿系统超声/遗传超声评估',
+      testId: 'test_case5_pelvic_ultrasound',
+      name: '盆腔超声评估子宫和卵巢发育',
       type: 'laboratory',
       available: true,
       recommendedPriority: 2,
       allowRepeat: false,
       prerequisites: [],
-      resultTitle: '胎儿系统超声评估结果',
-      resultText: '胎儿超声提示可疑异常表现，支持进一步重视性染色体异常风险，但单凭超声不能完成确诊。',
-      teachingValue: '提示学生：超声可提供支持线索，但不能替代染色体诊断。',
-      interpretationHint: '若前期筛查高风险，仍应重视确诊性检查。'
+      resultTitle: '盆腔超声结果',
+      resultText: '子宫偏小，双侧卵巢显示不清，提示性腺发育不充分。',
+      teachingValue: '用于评估原发闭经和Turner综合征相关生殖系统发育情况。',
+      interpretationHint: '该结果支持临床表型判断，但不能替代染色体核型分析。'
     },
     {
-      testId: 'test_case5_amniocentesis_karyotype',
-      name: '羊水穿刺胎儿核型分析',
-      type: 'genetic',
+      testId: 'test_case5_hormone_panel',
+      name: '性激素和卵巢功能相关评估',
+      type: 'laboratory',
       available: true,
       recommendedPriority: 3,
       allowRepeat: false,
       prerequisites: [],
-      resultTitle: '羊水穿刺胎儿核型分析结果',
-      resultText: '胎儿核型结果：45,X。',
-      teachingValue: '这是本病例最关键的确诊性检查。',
-      interpretationHint: '该结果支持胎儿 Turner 综合征。'
+      resultTitle: '性激素和卵巢功能评估结果',
+      resultText: '结果提示卵巢功能不全倾向，与原发闭经和Turner综合征背景相符。',
+      teachingValue: '帮助评估内分泌状态、青春期发育和后续激素替代治疗需求。',
+      interpretationHint: '该检查有助于管理方案制定，但不是染色体病因确诊依据。'
     },
     {
-      testId: 'test_case5_cma',
-      name: '胎儿染色体拷贝数变异分析',
+      testId: 'test_case5_heart_kidney',
+      name: '心脏超声和肾脏超声筛查',
       type: 'laboratory',
       available: true,
       recommendedPriority: 2,
       allowRepeat: false,
       prerequisites: [],
-      resultTitle: '胎儿染色体相关分析结果',
-      resultText: '结果提示 X 染色体异常，支持 Turner 综合征可能。',
-      teachingValue: '可作为辅助结果，但正式结论仍应结合标准产前诊断结果。',
-      interpretationHint: '辅助结果支持异常，但不能替代完整核型分析。'
+      resultTitle: '心脏和肾脏结构筛查结果',
+      resultText: '建议持续评估主动脉、瓣膜及肾脏结构风险；本次筛查未见需要立即处理的严重异常。',
+      teachingValue: 'Turner综合征咨询不能只停留在诊断，还应覆盖系统健康管理。',
+      interpretationHint: '该检查用于并发症筛查和长期管理，不是原发闭经病因确诊检查。'
     },
     {
-      testId: 'test_case5_maternal_liver',
-      name: '孕妇肝功能检查',
+      testId: 'test_case5_liver',
+      name: '肝功能检查',
       type: 'distractor',
       available: true,
       recommendedPriority: 0,
       allowRepeat: false,
       prerequisites: [],
-      resultTitle: '孕妇肝功能检查结果',
+      resultTitle: '肝功能检查结果',
       resultText: '肝功能未见明显异常。',
-      teachingValue: '与当前胎儿性染色体异常判断关联较弱。',
-      interpretationHint: '不能回答胎儿是否存在 Turner 综合征这一核心问题。'
+      teachingValue: '与原发闭经和Turner综合征诊断关联较弱。',
+      interpretationHint: '不能回答患者是否存在Turner综合征这一核心问题。'
     },
     {
       testId: 'test_case5_torch',
@@ -1763,97 +1762,97 @@ case5: {
       allowRepeat: false,
       prerequisites: [],
       resultTitle: 'TORCH相关检查结果',
-      resultText: '未见可直接解释当前性染色体异常高风险的感染学证据。',
+      resultText: '未见可直接解释原发闭经和身材矮小的感染学证据。',
       teachingValue: '帮助学生区分不同问题对应不同检查路径。',
-      interpretationHint: '该检查不能替代针对染色体异常的产前诊断。'
+      interpretationHint: '该检查不能替代外周血染色体核型分析。'
     }
   ],
 
   testLogic: {
     recommendedOrder: [
-      'test_case5_ultrasound_report',
-      'test_case5_targeted_ultrasound',
-      'test_case5_amniocentesis_karyotype'
+      'test_case5_karyotype',
+      'test_case5_pelvic_ultrasound',
+      'test_case5_heart_kidney'
     ],
     unlockStages: {
       stage1: [
-        'test_case5_ultrasound_report',
-        'test_case5_targeted_ultrasound',
-        'test_case5_cma',
-        'test_case5_maternal_liver',
+        'test_case5_karyotype',
+        'test_case5_pelvic_ultrasound',
+        'test_case5_hormone_panel',
+        'test_case5_liver',
         'test_case5_torch'
       ],
-      stage2: ['test_case5_amniocentesis_karyotype']
+      stage2: ['test_case5_heart_kidney']
     },
     coreTests: [
-      'test_case5_ultrasound_report',
-      'test_case5_amniocentesis_karyotype'
+      'test_case5_karyotype',
+      'test_case5_pelvic_ultrasound'
     ],
     auxiliaryTests: [
-      'test_case5_targeted_ultrasound',
-      'test_case5_cma'
+      'test_case5_hormone_panel',
+      'test_case5_heart_kidney'
     ],
     distractorTests: [
-      'test_case5_maternal_liver',
+      'test_case5_liver',
       'test_case5_torch'
     ],
     notes: [
-      '本病例训练重点是区分高风险提示与确诊。',
-      'NIPT提示性染色体异常风险，但不能直接替代确诊。',
-      '羊水穿刺胎儿核型分析是关键确诊性检查。'
+      '本病例训练重点是从原发闭经和身材矮小识别Turner综合征线索。',
+      '外周血染色体核型分析是明确性染色体异常和嵌合情况的关键检查。',
+      '确诊后还需要进行心血管、肾脏、内分泌和生育相关长期管理咨询。'
     ],
     scoringHint: {
-      excellent: '能识别筛查与确诊的层级，并选择关键确诊检查。',
-      acceptable: '能抓住大方向，但混入1项低价值检查。',
-      poor: '只停留在筛查层面，或主要选择了无关检查。'
+      excellent: '能围绕原发闭经、身材矮小和Turner综合征选择核型分析及系统评估。',
+      acceptable: '能抓住核型分析方向，但对系统管理评估不够完整。',
+      poor: '忽略核型分析，或主要选择与原发闭经无关的检查。'
     }
   },
 
   finalAnswer: {
     coreInterpretation: [
-      '这是一个 Turner 综合征高风险胎儿的产前遗传咨询病例。',
-      '超声和NIPT均属于高风险提示，不能直接替代确诊。',
-      '羊水穿刺胎儿核型分析结果若为45,X，可支持胎儿 Turner 综合征。'
+      '这是一个原发闭经、身材矮小背景下的Turner综合征遗传咨询病例。',
+      '外周血染色体核型分析发现45,X/46,XX嵌合，可支持Turner综合征相关诊断。',
+      '盆腔超声和性激素评估有助于理解卵巢功能不全和生殖系统发育情况。'
     ],
-    likelyInheritance: '多数为散发性性染色体数目异常，并非典型孟德尔单基因遗传。',
-    likelyDiagnosis: '胎儿 Turner 综合征（在羊水穿刺核型结果支持的前提下）。',
+    likelyInheritance: '多数为散发性性染色体数目异常或嵌合，并非典型孟德尔单基因遗传。',
+    likelyDiagnosis: 'Turner综合征相关诊断，核型提示45,X/46,XX嵌合。',
     counselingAdvice: [
-      '向患者解释高风险提示与确诊的区别。',
-      '说明羊水穿刺等确诊性产前诊断的意义与局限。',
-      '结合孕周、检查结果与家庭意愿进行后续决策咨询。',
-      '必要时提供进一步产前诊断、妊娠管理及心理支持。'
+      '向患者解释Turner综合征与原发闭经、身材矮小、卵巢功能不全之间的关系。',
+      '说明嵌合核型可能带来表型差异，不能只用一个标签概括全部预后。',
+      '建议进行心血管、肾脏、甲状腺、代谢和骨健康等系统评估与长期随访。',
+      '讨论青春期/激素替代治疗、生育可能性、生殖医学转诊和心理支持。'
     ]
   },
 
   teacherRubric: {
     keyHistoryPoints: [
-      '是否问出当前孕周',
-      '是否问出前期超声和无创异常',
-      '是否问出患者最核心焦虑',
-      '是否问出是否已有明确确诊检查',
+      '是否问出年龄和原发闭经情况',
+      '是否问出身高和青春期发育情况',
+      '是否问出既往妇科超声线索',
+      '是否问出患者对未来健康和生育的核心焦虑',
       '是否问出家族史与近亲婚配情况'
     ],
     reasoningPoints: [
-      '能否区分高风险提示和确诊',
-      '能否提出羊水穿刺核型分析的关键地位',
-      '能否识别超声与辅助检测的辅助性质'
+      '能否从原发闭经和身材矮小识别性染色体异常线索',
+      '能否提出外周血染色体核型分析的关键地位',
+      '能否识别盆腔超声、性激素和系统并发症筛查的辅助管理价值'
     ],
     advicePoints: [
-      '能否进行风险沟通',
-      '能否给出下一步检查与决策建议'
+      '能否解释诊断和长期健康管理重点',
+      '能否讨论生育、心理支持和自主选择'
     ]
   },
 
   commonMistakes: [
-    '把无创高风险直接当成确诊',
-    '不区分筛查与产前诊断',
-    '只安慰患者，不提出关键确诊步骤',
-    '乱选与染色体异常无关的检查',
-    '不会做后续决策沟通'
+    '只把问题归因于普通月经不调，忽略染色体异常线索',
+    '只做盆腔超声，不做外周血染色体核型分析',
+    '确诊后只讨论月经，不讨论心血管、肾脏和内分泌长期管理',
+    '用绝对化语言判断患者一定不能生育',
+    '忽视患者青春期、身体形象和未来生育焦虑'
   ],
 
   frontendHints: {
-    displayTag: 'Turner / 产前诊断',
+    displayTag: 'Turner / 原发闭经',
     expectedGroupTimeMin: 10,
     expectedGroupTimeMax: 15
   }
@@ -4105,140 +4104,6 @@ function generateCase5TeachingMockReply(question, history = []) {
   }
 
   return '医生，我现在就是想弄清楚，为什么一直没有正常月经，身高也比别人矮这么多。之前医生只是说可能要查染色体，但我自己完全不懂。';
-}
-
-function generateCase5LegacyEnhancedMockReply(caseData, question, history = []) {
-  const q = (question || '').trim().toLowerCase();
-
-  const textHistory = (history || [])
-    .map(item => {
-      if (typeof item === 'string') return item;
-      return `${item.role || ''}:${item.content || ''}`;
-    })
-    .join(' ')
-    .toLowerCase();
-
-  const askedWhyCome =
-    q.includes('为什么来') ||
-    q.includes('来咨询什么') ||
-    q.includes('主要想问什么') ||
-    q.includes('怎么了');
-
-  const askedWeeks =
-    q.includes('怀孕多久') ||
-    q.includes('多少周') ||
-    q.includes('孕周') ||
-    q.includes('几个月');
-
-  const askedUltrasound =
-    q.includes('超声') ||
-    q.includes('b超') ||
-    q.includes('nt') ||
-    q.includes('水肿') ||
-    q.includes('颈后') ||
-    q.includes('胎儿情况');
-
-  const askedNipt =
-    q.includes('无创') ||
-    q.includes('nipt') ||
-    q.includes('筛查') ||
-    q.includes('检查结果');
-
-  const askedAmnio =
-    q.includes('羊穿') ||
-    q.includes('羊水穿刺') ||
-    q.includes('穿刺') ||
-    q.includes('确诊');
-
-  const askedNeedDiagnosis =
-    q.includes('是不是确定') ||
-    q.includes('是不是确诊') ||
-    q.includes('到底有没有问题') ||
-    q.includes('能不能确定');
-
-  const askedRisk =
-    q.includes('风险') ||
-    q.includes('危险') ||
-    q.includes('流产') ||
-    q.includes('安不安全');
-
-  const askedFamilyHistory =
-    q.includes('家族史') ||
-    q.includes('家里') ||
-    q.includes('亲属') ||
-    q.includes('类似情况');
-
-  const askedEmotion =
-    q.includes('最担心') ||
-    q.includes('害怕') ||
-    q.includes('紧张') ||
-    q.includes('心情');
-
-  const askedPlan =
-    q.includes('接下来') ||
-    q.includes('下一步') ||
-    q.includes('怎么办') ||
-    q.includes('建议做什么');
-
-  function pick(arr) {
-    return arr[Math.floor(Math.random() * arr.length)];
-  }
-
-  const fallbackReplies = [
-    '医生，我现在最怕的就是孩子是不是真的有问题，但又不敢凭一个结果就下结论。',
-    '我们这次来就是想知道，现在这些结果到底意味着什么，要不要再做更明确的检查。',
-    '报告上的内容越看越紧张，所以想听您帮我们理一理。'
-  ];
-
-  if (askedWhyCome) {
-    return '医生您好，我现在怀孕了，前面的超声和无创检查都提示胎儿可能有Turner综合征，所以我特别紧张，想来咨询一下。';
-  }
-
-  if (askedWeeks) {
-    return '我现在大概怀孕18周左右。';
-  }
-
-  if (askedUltrasound) {
-    return '前面做超声的时候，医生说胎儿有些异常表现，好像提到颈部那边和水肿之类的问题，所以建议我进一步查。';
-  }
-
-  if (askedNipt) {
-    return '后来又做了无创，结果提示胎儿有性染色体异常的风险，医生说偏向Turner，所以我们一下就慌了。';
-  }
-
-  if (askedNeedDiagnosis) {
-    return '这也是我最想弄清楚的地方。前面的检查都提示有风险，但到底是不是已经能确定，我自己心里完全没底。';
-  }
-
-  if (askedAmnio && askedRisk) {
-    return '医生也提过羊水穿刺，但我就是很纠结，一方面想尽快查清楚，另一方面又怕穿刺本身有风险。';
-  }
-
-  if (askedAmnio) {
-    return '医生提过羊水穿刺，说这个会更明确一些。但我现在就是不知道是不是一定要做到这一步。';
-  }
-
-  if (askedRisk) {
-    return '我现在最怕两件事，一件是孩子真的有问题，另一件是为了确诊再去做穿刺会不会有额外风险。';
-  }
-
-  if (askedFamilyHistory) {
-    return '我们两边家里都没有听说过类似的情况，至少没有明确的染色体异常或者这种先天问题。';
-  }
-
-  if (askedEmotion) {
-    return '我现在真的挺焦虑的，因为前面的检查一个接一个都不太好，但又没有一个人直接跟我说到底意味着什么。';
-  }
-
-  if (askedPlan) {
-    return '我们来就是想知道，现在这种情况最关键的下一步到底是什么，是不是要做确诊检查。';
-  }
-
-  if (textHistory.includes('turner') && !textHistory.includes('羊穿') && Math.random() > 0.5) {
-    return '医生，那像我这种前面超声和无创都提示有问题的情况，是不是一般还要靠更明确的产前诊断才能定下来？';
-  }
-
-  return pick(fallbackReplies);
 }
 
 function generateCase7EnhancedMockReply(caseData, question, history = []) {

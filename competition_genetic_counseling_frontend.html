@@ -706,9 +706,9 @@
         chiefConcern: '担心家族中男性亲属反复出血问题是否与遗传有关，并影响后代。',
         localBrief: '母系亲属有反复出血和关节肿痛史，本人无明显异常出血史；具体病名需通过资料复核和检测确认。',
         tests: [
-          { testId: 'case1_record', name: '患病亲属既往资料复核', type: 'information', resultTitle: '亲属资料复核', resultText: '资料提示舅舅凝血因子VIII活性明显降低，临床诊断为血友病A。', teachingValue: '先明确家族中具体疾病，再进行携带者风险评估。' },
-          { testId: 'case1_f8', name: '患者凝血相关家系变异针对性检测', type: 'genetic', resultTitle: 'F8基因检测', resultText: '检出与家族疾病一致的F8致病变异，提示患者为血友病A携带者。', teachingValue: '用于确认携带者状态及后续生育风险咨询。' },
-          { testId: 'case1_coagulation', name: '凝血功能及VIII因子活性', type: 'laboratory', resultTitle: '凝血相关检查', resultText: '常规凝血功能基本正常，VIII因子活性处于正常低值范围。', teachingValue: '女性携带者可无明显临床异常，不能单独排除携带状态。' },
+          { testId: 'case1_record', name: '患病亲属病历及F8变异报告复核', type: 'information', resultTitle: '亲属资料复核', resultText: '资料提示舅舅凝血因子VIII活性明显降低，临床诊断为血友病A；补充基因报告显示该家系存在F8致病变异。', teachingValue: '先明确家族中具体疾病和家系致病变异，再进行携带者风险评估。' },
+          { testId: 'case1_f8', name: '患者本人F8家系致病变异针对性检测', type: 'genetic', resultTitle: 'F8家系变异检测', resultText: '检出与家族疾病一致的F8致病变异，提示患者为血友病A携带者。', teachingValue: '用于确认携带者状态及后续生育风险咨询。' },
+          { testId: 'case1_coagulation', name: '凝血四项、因子VIII活性及VWF相关检测', type: 'laboratory', resultTitle: '凝血表型相关检查', resultText: 'APTT未见明显延长，VIII因子活性处于正常低值范围，VWF相关指标未见明确异常。', teachingValue: '女性携带者可无明显临床异常，凝血表型正常不能单独排除携带状态。' },
           { testId: 'case1_karyotype', name: '外周血染色体核型分析', type: 'distractor', resultTitle: '染色体核型分析', resultText: '46,XX，未见明显染色体数目或结构异常。', teachingValue: '本病例重点不是染色体病，检查方向价值有限。' }
         ]
       },
@@ -722,8 +722,9 @@
         chiefConcern: '夫妻双方小细胞低色素改变的原因及生育风险。',
         localBrief: '南方地区来访者，小细胞低色素改变，伴侣也有轻度红细胞指标异常；病因需通过血液学和基因检测判断。',
         tests: [
-          { testId: 'case2_blood', name: '双方血常规及红细胞指数复核', type: 'laboratory', resultTitle: '血液学筛查', resultText: '女方MCV、MCH降低；男方红细胞指数亦偏低，提示需进一步做地贫基因检测。', teachingValue: '血液学筛查可提示携带风险，但不能确定基因型。' },
-          { testId: 'case2_gene', name: '夫妻双方小细胞贫血相关遗传检测', type: 'genetic', resultTitle: '地中海贫血基因检测', resultText: '双方均检出β地中海贫血相关变异，后代存在重型地贫风险。', teachingValue: '夫妻同型或相关携带时需进行生育风险咨询和产前诊断讨论。' },
+          { testId: 'case2_blood', name: '双方血常规及红细胞指数复核', type: 'laboratory', resultTitle: '血液学筛查', resultText: '女方Hb轻度降低，MCV、MCH降低；男方Hb基本正常，但MCV、MCH亦偏低，提示双方均需进一步做地中海贫血筛查。', teachingValue: '血液学筛查可提示携带风险，但不能确定基因型。' },
+          { testId: 'case2_hb_analysis', name: '双方血红蛋白电泳/HbA2定量分析', type: 'laboratory', resultTitle: '血红蛋白分析', resultText: '双方HbA2均升高，结合红细胞指数，提示β地中海贫血携带可能。', teachingValue: 'HbA2升高是β地中海贫血携带者筛查的重要线索，但仍需基因检测确认。' },
+          { testId: 'case2_gene', name: '夫妻双方HBB基因变异检测', type: 'genetic', resultTitle: 'β地中海贫血基因检测', resultText: '双方均检出HBB基因致病变异，提示夫妻均为β地中海贫血携带者；每次妊娠胎儿存在重型β地中海贫血风险。', teachingValue: '夫妻双方同为β地贫携带者时，需进行生育风险咨询、产前诊断或PGT等方案讨论。' },
           { testId: 'case2_iron', name: '铁代谢指标检测', type: 'laboratory', resultTitle: '铁代谢检查', resultText: '铁蛋白未见明显降低，不支持单纯缺铁性贫血解释全部表现。', teachingValue: '有助于与缺铁性贫血鉴别。' },
           { testId: 'case2_liver', name: '肝肾功能常规检查', type: 'distractor', resultTitle: '肝肾功能', resultText: '未见明显异常。', teachingValue: '不能回答本次遗传咨询的核心风险。' }
         ]
@@ -738,7 +739,7 @@
         chiefConcern: '反复早孕流产的可能原因及再次妊娠前评估。',
         localBrief: '既往3次早孕期自然流产，未获得完整胚胎遗传学资料；需通过病史、夫妻核型和流产组织资料逐步判断。',
         tests: [
-          { testId: 'case3_couple_karyotype', name: '夫妻双方外周血染色体核型分析', type: 'genetic', resultTitle: '夫妻核型分析', resultText: '女方检出平衡易位，男方核型未见明显异常。', teachingValue: '反复流产中应考虑父母平衡易位等染色体结构异常。' },
+          { testId: 'case3_couple_karyotype', name: '夫妻双方外周血染色体核型分析', type: 'genetic', resultTitle: '夫妻核型分析', resultText: '女方核型46,XX；男方核型46,XY,t(11;22)(q23;q11)，提示男方为平衡易位携带者。', teachingValue: '反复流产中应考虑父母平衡易位等染色体结构异常。' },
           { testId: 'case3_products', name: '流产组织染色体/拷贝数检测', type: 'genetic', resultTitle: '流产组织遗传学检测', resultText: '既往样本不可用；建议后续如再次发生妊娠丢失，尽量保留组织进行检测。', teachingValue: '可帮助区分偶发胚胎异常与父母因素。' },
           { testId: 'case3_ultrasound', name: '妇科超声及子宫结构评估', type: 'laboratory', resultTitle: '子宫结构评估', resultText: '未见明显子宫畸形。', teachingValue: '反复流产评估需多因素整合。' },
           { testId: 'case3_blood', name: '常规血液生化检查', type: 'distractor', resultTitle: '常规检查', resultText: '未见特异性异常。', teachingValue: '对遗传学病因判断帮助有限。' }
@@ -859,8 +860,8 @@
           detail: [
             '材料名称：患病亲属既往病历资料',
             '资料来源：患者母系亲属既往就诊记录复印件',
-            '关键信息：患者舅舅自幼反复出血，凝血因子VIII活性明显降低，临床诊断为血友病A。',
-            '补充信息：舅舅之子也有类似出血表现。',
+            '关键信息：患者舅舅自幼反复出血，凝血因子VIII活性明显降低，临床诊断为血友病A；后续基因报告提示该家系存在F8致病变异。',
+            '补充信息：患者母系家族另一位女性亲属的儿子也有类似出血表现。',
             '教学提示：该资料用于确认家系中的具体疾病名称，后续仍需评估患者本人是否为携带者。'
           ]
         }
@@ -1185,7 +1186,9 @@
     }
 
     function getPriorMaterialTestIds(caseId) {
-      return getLocalMaterials(caseId).flatMap(item => item.linkedTestIds || []);
+      return getLocalMaterials(caseId)
+        .filter(item => viewedMaterialIds.includes(item.materialId))
+        .flatMap(item => item.linkedTestIds || []);
     }
 
     function isAskingForPriorReports(text) {
@@ -1391,7 +1394,7 @@
 
       if (caseData.caseId === 'case1') {
         if (includesAny(q, ['谁', '家族', '亲属', '亲戚', '哪边', '爸爸', '妈妈', '舅舅'])) {
-          return '主要是我妈妈这边的亲戚。印象里是我舅舅从小就容易出血，磕碰以后不太容易止住，后来他的儿子好像也有类似情况。';
+          return '主要是我妈妈这边的亲戚。印象里是我舅舅从小就容易出血，磕碰以后不太容易止住。我妈还提过，母系家族里另一位女性亲属的儿子也有类似情况。';
         }
         if (includesAny(q, ['出血', '关节', '症状', '表现'])) {
           return '他们会有反复出血，家里人还说过关节肿痛。具体病名我说不准，资料可能需要再复核。';
@@ -1574,17 +1577,17 @@
         },
         case2: {
           conceptTerms: ['地中海贫血', '地贫', '小细胞', '低色素', 'mcv', 'mch', '基因检测', '双方携带', '重型地贫', '25%', '产前诊断'],
-          keyTests: ['case2_blood', 'case2_gene'],
+          keyTests: ['case2_blood', 'case2_hb_analysis', 'case2_gene'],
           supportiveTests: ['case2_iron'],
           distractorTests: ['case2_liver'],
-          pathwayName: '血液学筛查、铁代谢鉴别和夫妻双方地贫基因检测',
+          pathwayName: '血液学筛查、HbA2定量分析、铁代谢鉴别和夫妻双方HBB基因检测',
           diagnosisName: '夫妻双方地中海贫血携带与后代重型地贫风险咨询',
-          testStrength: '检查路径能从红细胞指数复核进入夫妻双方地贫基因检测，并注意与缺铁性贫血鉴别。',
+          testStrength: '检查路径能从红细胞指数复核进入HbA2/血红蛋白分析和夫妻双方HBB基因检测，并注意与缺铁性贫血鉴别。',
           conceptStrength: '能围绕地中海贫血携带、夫妻同型携带和后代风险进行解释。',
           missingConcept: '尚需说明小细胞低色素只是提示线索，最终风险要依赖夫妻双方基因型判断。',
-          missingPathway: '建议补充夫妻双方地贫基因检测，并根据基因型讨论产前诊断或辅助生殖选择。',
-          sample: '可以这样表达：您和伴侣的红细胞指数异常提示可能存在地中海贫血携带，但不能只凭血常规下结论。建议双方做地贫基因检测，若双方携带同一类型相关变异，后代可能有重型地贫风险，可进一步讨论产前诊断、胚胎植入前检测或其他生育选择。',
-          nextGoal: '下次训练目标：完成“血常规线索、鉴别缺铁、双方基因检测、后代风险、产前诊断选择”五步咨询。'
+          missingPathway: '建议补充HbA2/血红蛋白分析和夫妻双方HBB基因检测，并根据基因型讨论产前诊断或辅助生殖选择。',
+          sample: '可以这样表达：您和伴侣的红细胞指数异常提示可能存在地中海贫血携带，但不能只凭血常规下结论。建议结合铁代谢、HbA2/血红蛋白分析和HBB基因检测确认。如果双方都是β地贫携带者，每次妊娠胎儿存在重型β地贫风险，可进一步讨论产前诊断、胚胎植入前检测或其他生育选择。',
+          nextGoal: '下次训练目标：完成“血常规线索、鉴别缺铁、HbA2分析、双方HBB检测、后代风险和产前诊断选择”六步咨询。'
         },
         case3: {
           conceptTerms: ['反复流产', '自然流产', '夫妻核型', '平衡易位', '染色体结构异常', '流产组织', '胚胎染色体', 'pgt', '产前诊断'],
@@ -1687,9 +1690,54 @@
       };
       const profile = profiles[selectedCaseId] || profiles.case4;
       const termHits = profile.conceptTerms.filter(term => q.includes(normalizeText(term))).length;
-      const keyHits = profile.keyTests.filter(testId => completedTests.includes(testId)).length;
-      const supportiveHits = profile.supportiveTests.filter(testId => completedTests.includes(testId)).length;
-      const distractorHits = profile.distractorTests.filter(testId => completedTests.includes(testId)).length;
+      const testIdAliases = {
+        test_uncle_record: ['case1_record'],
+        test_patient_targeted_genetic: ['case1_f8'],
+        test_patient_bleeding_lab: ['case1_coagulation'],
+        test_patient_karyotype: ['case1_karyotype'],
+        test_both_cbc: ['case2_blood'],
+        test_hb_analysis: ['case2_hb_analysis'],
+        test_both_thal_gene: ['case2_gene'],
+        test_iron_study: ['case2_iron'],
+        test_male_liver: ['case2_liver'],
+        test_couple_karyotype: ['case3_couple_karyotype'],
+        test_poc_record: ['case3_products'],
+        test_basic_repro_eval: ['case3_ultrasound'],
+        test_female_liver: ['case3_blood'],
+        test_case4_screening_report: ['case4_review_reports'],
+        test_case4_targeted_ultrasound: ['case4_ultrasound'],
+        test_case4_amniocentesis_karyotype: ['case4_amniocentesis_karyotype'],
+        test_case5_karyotype: ['case5_karyotype'],
+        case5_pelvic_ultrasound: ['case5_ultrasound'],
+        test_case5_pelvic_ultrasound: ['case5_ultrasound'],
+        case5_heart_kidney: ['case5_heart'],
+        test_case5_heart_kidney: ['case5_heart'],
+        case5_metabolic: ['case5_metabolic'],
+        test_case5_liver: ['case5_metabolic'],
+        test_case6_father_record: ['case6_father_record'],
+        test_case6_patient_targeted_test: ['case6_predictive'],
+        test_case6_psych_eval: ['case6_psych'],
+        test_case6_brain_mri: ['case6_ct'],
+        test_case7_child_record: ['case7_child_record'],
+        test_case7_targeted_ultrasound_plan: ['case7_ultrasound'],
+        test_case7_prepregnancy_guidance: ['case7_panel'],
+        test_case7_couple_karyotype: ['case7_blood'],
+        test_case8_eye_record: ['case8_eye'],
+        test_case8_mtDNA_test: ['case8_mtdna'],
+        test_case8_family_assessment: ['case8_maternal'],
+        test_case8_karyotype: ['case8_karyotype'],
+        test_case9_semen_analysis: ['case9_semen'],
+        test_case9_hormone_panel: ['case9_hormone'],
+        test_case9_karyotype: ['case9_karyotype'],
+        test_case9_female_thal_screen: ['case9_partner']
+      };
+      const effectiveCompletedTests = new Set([...completedTests, ...getPriorMaterialTestIds(selectedCaseId)]);
+      [...effectiveCompletedTests].forEach(id => {
+        (testIdAliases[id] || []).forEach(alias => effectiveCompletedTests.add(alias));
+      });
+      const keyHits = profile.keyTests.filter(testId => effectiveCompletedTests.has(testId)).length;
+      const supportiveHits = profile.supportiveTests.filter(testId => effectiveCompletedTests.has(testId)).length;
+      const distractorHits = profile.distractorTests.filter(testId => effectiveCompletedTests.has(testId)).length;
       const hasAnxietyResponse =
         dialogueState.addressedAnxiety ||
         includesAny(q, ['理解您', '焦虑', '紧张', '害怕', '担心']);
@@ -2176,12 +2224,13 @@ ${escapeHtml(score.nextGoal)}
 
     function getVisibleTests() {
       const priorMaterialTestIds = getPriorMaterialTestIds(caseSelect.value);
+      const satisfiedTestIds = new Set([...completedTests, ...priorMaterialTestIds]);
       return currentTests.filter(item => {
         if (completedTests.includes(item.testId)) return false;
         if (priorMaterialTestIds.includes(item.testId)) return false;
 
         const prerequisites = Array.isArray(item.prerequisites) ? item.prerequisites : [];
-        return prerequisites.every(prereq => completedTests.includes(prereq));
+        return prerequisites.every(prereq => satisfiedTestIds.has(prereq));
       });
     }
 
