@@ -1559,6 +1559,17 @@
     function buildLocalScore() {
       const allText = conversationHistory.map(item => item.content || '').join('\n');
       const q = normalizeText(allText);
+      const studentMessages = conversationHistory
+        .filter(item => item.role === 'student')
+        .map(item => (item.content || '').trim())
+        .filter(Boolean);
+      const studentText = studentMessages.join('\n');
+      const studentQ = normalizeText(studentText);
+      const effectiveStudentMessages = studentMessages.filter(text => {
+        const normalized = normalizeText(text);
+        return normalized.length >= 4 && !['好的', '好', '嗯', '是的', '对', '谢谢', '明白'].includes(normalized);
+      });
+      const hasEffectiveStudentInput = effectiveStudentMessages.length > 0;
       const selectedCaseId = caseSelect.value;
       const profiles = {
         case1: {
@@ -1689,7 +1700,7 @@
         }
       };
       const profile = profiles[selectedCaseId] || profiles.case4;
-      const termHits = profile.conceptTerms.filter(term => q.includes(normalizeText(term))).length;
+      const termHits = profile.conceptTerms.filter(term => studentQ.includes(normalizeText(term))).length;
       const testIdAliases = {
         test_uncle_record: ['case1_record'],
         test_patient_targeted_genetic: ['case1_f8'],
@@ -1738,41 +1749,64 @@
       const keyHits = profile.keyTests.filter(testId => effectiveCompletedTests.has(testId)).length;
       const supportiveHits = profile.supportiveTests.filter(testId => effectiveCompletedTests.has(testId)).length;
       const distractorHits = profile.distractorTests.filter(testId => effectiveCompletedTests.has(testId)).length;
+
+      if (!hasEffectiveStudentInput) {
+        return {
+          total: 10,
+          dimensions: { medical: 2, pathway: 0, empathy: 2, ethics: 0, language: 6 },
+          strengths: ['已进入病例场景，但尚未形成有效问诊或咨询内容。'],
+          gaps: [
+            '未提出有效问诊问题，无法评估医学判断和遗传咨询思路。',
+            '未选择关键检查，无法形成诊断或风险评估路径。',
+            '未回应患者焦虑，也未体现知情同意和自主选择。'
+          ],
+          suggestions: [
+            '先询问来访目的、既往资料、家族史和患者最担心的问题。',
+            `围绕“${profile.pathwayName}”选择关键检查，不要在无信息基础上结束问诊。`,
+            '至少完成一次风险解释和一次共情回应后再结束训练。'
+          ],
+          sample: profile.sample,
+          nextGoal: '下次训练目标：至少完成3轮有效问诊、1条关键检查路径和1段风险解释后再结束问诊。'
+        };
+      }
+
       const hasAnxietyResponse =
         dialogueState.addressedAnxiety ||
-        includesAny(q, ['理解您', '焦虑', '紧张', '害怕', '担心']);
+        includesAny(studentQ, ['理解您', '我理解', '能理解', '先别急', '陪您', '担心是正常', '焦虑', '紧张', '害怕']);
       const hasConsentAndAutonomy =
         dialogueState.mentionedConsent &&
         dialogueState.respectedAutonomy;
 
-      let medical = 12 + Math.min(termHits, 5) * 3;
+      let medical = 6 + Math.min(termHits, 5) * 3;
       if (keyHits >= 1) medical += 2;
       if (keyHits >= profile.keyTests.length) medical += 2;
       if (selectedCaseId === 'case4' && dialogueState.explainedHighRiskNotConfirmed) medical += 2;
       medical = Math.min(30, medical);
 
-      let pathway = 8 + Math.min(completedTests.length, 3) * 3;
+      let pathway = 4 + Math.min(completedTests.length, 3) * 3;
       pathway += keyHits * 5 + supportiveHits * 2;
       if (keyHits === 0 && distractorHits > 0) pathway -= 4;
       if (selectedCaseId === 'case4' && dialogueState.mentionedAmniocentesis) pathway += 2;
       if (dialogueState.mentionedKaryotype || dialogueState.mentionedPrenatalDiagnosis) pathway += 1;
       pathway = Math.max(0, Math.min(25, pathway));
 
-      let empathy = 8;
+      let empathy = 2;
       if (hasAnxietyResponse) empathy += 8;
-      if (conversationHistory.filter(item => item.role === 'student').length >= 3) empathy += 4;
+      if (effectiveStudentMessages.length >= 3) empathy += 4;
+      if (effectiveStudentMessages.length >= 5) empathy += 2;
       empathy = Math.min(20, empathy);
 
-      let ethics = 5;
+      let ethics = 0;
       if (dialogueState.mentionedConsent) ethics += 5;
       if (dialogueState.respectedAutonomy) ethics += 4;
       if (selectedCaseId === 'case4' && dialogueState.avoidedDirectTermination) ethics += 4;
       if (selectedCaseId === 'case4' && !dialogueState.avoidedDirectTermination) ethics -= 5;
       ethics = Math.max(0, Math.min(15, ethics));
 
-      let language = 6;
-      if (allText.length > 120) language += 2;
-      if (includesAny(q, ['先', '下一步', '建议', '同时', '不能'])) language += 2;
+      let language = 3;
+      if (studentText.length > 80) language += 2;
+      if (includesAny(studentQ, ['先', '下一步', '建议', '同时', '不能', '需要', '然后'])) language += 2;
+      if (effectiveStudentMessages.length >= 3) language += 1;
       language = Math.min(10, language);
 
       const total = medical + pathway + empathy + ethics + language;
@@ -1782,7 +1816,7 @@
 
       if (medical >= 24) strengths.push(profile.conceptStrength);
       if (pathway >= 20) strengths.push(profile.testStrength);
-      if (empathy >= 16) strengths.push('能回应患者焦虑，沟通语气较稳定。');
+      if (hasAnxietyResponse && empathy >= 12) strengths.push('能回应患者焦虑，沟通语气较稳定。');
       if (ethics >= 12) strengths.push('体现知情同意和自主选择，未直接替患者做决定。');
 
       if (termHits < 2) gaps.push(profile.missingConcept);
@@ -1798,7 +1832,7 @@
       return {
         total,
         dimensions: { medical, pathway, empathy, ethics, language },
-        strengths: strengths.length ? strengths : ['已完成基本问诊流程，能够围绕患者主要担忧展开。'],
+        strengths: strengths.length ? strengths : ['已开始本病例训练，但尚未形成可明确判定的优势表现。'],
         gaps: gaps.length ? gaps : ['整体要点较完整，可继续提高表达的结构化程度。'],
         suggestions,
         sample: profile.sample,
