@@ -248,7 +248,7 @@ const TEACHING_TEST_OVERRIDES = {
       allowRepeat: false,
       prerequisites: [],
       resultTitle: '心肾结构评估',
-      resultText: '建议进行心脏超声、血压评估和肾脏超声筛查；当前资料未见明确严重结构异常。',
+      resultText: '心脏超声、血压评估和肾脏超声筛查已完成；当前未见明确需要立即处理的严重心肾结构异常。',
       teachingValue: 'Turner综合征相关咨询不能只停留在核型诊断，还要关注系统并发症管理。',
       interpretationHint: '这是诊断后的管理评估，不是首个确诊检查。'
     },
@@ -1736,7 +1736,7 @@ case5: {
       allowRepeat: false,
       prerequisites: [],
       resultTitle: '心脏和肾脏结构筛查结果',
-      resultText: '建议持续评估主动脉、瓣膜及肾脏结构风险；本次筛查未见需要立即处理的严重异常。',
+      resultText: '本次心脏超声和肾脏超声筛查未见需要立即处理的严重异常；后续仍需结合Turner综合征管理要求定期随访主动脉、瓣膜、血压及肾脏结构。',
       teachingValue: 'Turner综合征咨询不能只停留在诊断，还应覆盖系统健康管理。',
       interpretationHint: '该检查用于并发症筛查和长期管理，不是原发闭经病因确诊检查。'
     },
@@ -2225,20 +2225,20 @@ case7: {
       allowRepeat: false,
       prerequisites: [],
       resultTitle: '家系与再发风险综合评估结果',
-      resultText: '结合既往已有一名唇腭裂患儿、家族中无明显聚集现象，目前更符合多因素遗传病背景，再次妊娠风险较一般人群升高。',
+      resultText: '结合既往已有一名唇腭裂患儿、家族中无明显聚集现象，目前更符合多因素遗传病背景。再次妊娠经验再发风险约为3%-5%，需结合患儿严重程度、是否双侧、家族史和环境因素进一步修正；风险升高但不是一定再发。',
       teachingValue: '帮助学生理解：多基因遗传病咨询重在综合评估，而非简单单基因判断。',
       interpretationHint: '应向患者进行再发风险沟通，并提出孕前孕期干预建议。'
     },
     {
       testId: 'test_case7_prepregnancy_guidance',
-      name: '孕前干预与叶酸补充评估',
-      type: 'laboratory',
+      name: '孕前风险因素与叶酸补充评估',
+      type: 'information',
       available: true,
       recommendedPriority: 2,
       allowRepeat: false,
       prerequisites: [],
-      resultTitle: '孕前干预与叶酸补充评估结果',
-      resultText: '建议规范孕前准备，强调叶酸补充、避免不良暴露并加强孕期随访。',
+      resultTitle: '孕前风险因素与叶酸补充评估结果',
+      resultText: '孕前评估显示需重点进行可干预风险因素管理：尽早规律补充叶酸，避免吸烟、饮酒、致畸药物及其他明确不良暴露，并在计划妊娠前完成产前遗传咨询。',
       teachingValue: '突出本病例的实践重点是再发风险管理与孕前预防。',
       interpretationHint: '该结果更偏向管理建议，而非病因确诊。'
     },
@@ -2251,7 +2251,7 @@ case7: {
       allowRepeat: false,
       prerequisites: [],
       resultTitle: '下一胎孕期超声筛查方案结果',
-      resultText: '建议下一胎妊娠时加强系统超声随访，重点关注胎儿面部结构发育。',
+      resultText: '下一胎妊娠时可在合适孕周进行系统超声和颜面部结构重点评估；超声可发现部分唇腭部结构异常，但不能保证排除所有轻微或隐匿异常。',
       teachingValue: '帮助学生把遗传咨询真正落到下一胎监测方案上。',
       interpretationHint: '多因素遗传病咨询通常需要配合孕期结构筛查。'
     },
@@ -2327,7 +2327,7 @@ case7: {
     coreInterpretation: [
       '这是一个既往生育唇腭裂患儿后的再发风险遗传咨询病例。',
       '若第一胎更像孤立性/非综合征性唇腭裂，则更符合多因素遗传病背景。',
-      '再次妊娠风险较一般人群升高，但并非简单单基因孟德尔遗传模式。'
+      '再次妊娠经验再发风险约为3%-5%，较一般人群升高，但并非简单单基因孟德尔遗传模式。'
     ],
     likelyInheritance: '多基因/多因素遗传背景',
     likelyDiagnosis: '既往非综合征性唇腭裂患儿家庭的再发风险咨询对象。',
@@ -2477,9 +2477,9 @@ case8: {
       allowRepeat: false,
       prerequisites: [],
       resultTitle: '眼科既往检查资料结果',
-      resultText: '眼科资料提示双眼视神经病变，临床考虑 LHON 可能。',
-      teachingValue: '这是本病例的重要起点，先确认临床方向是否支持 LHON。',
-      interpretationHint: '若临床高度怀疑 LHON，应进一步结合家族史与遗传学检测。'
+      resultText: '眼科资料提示双眼中心视力下降和视神经受累表现，需考虑遗传性视神经病变可能；不能仅凭眼科表现完成遗传学诊断。',
+      teachingValue: '这是本病例的重要起点，先确认临床表型是否支持遗传性视神经病变方向。',
+      interpretationHint: '若临床怀疑遗传性视神经病变，应进一步结合家族史与遗传学检测。'
     },
     {
       testId: 'test_case8_mtDNA_test',
@@ -2496,16 +2496,16 @@ case8: {
     },
     {
       testId: 'test_case8_family_assessment',
-      name: '母系家族成员风险评估',
+      name: '家族史与亲属风险资料收集',
       type: 'information',
       available: true,
       recommendedPriority: 2,
       allowRepeat: false,
       prerequisites: [],
-      resultTitle: '母系家族成员风险评估结果',
-      resultText: '结合家族信息，母系亲属风险更值得关注；父系家族目前缺乏类似线索。',
-      teachingValue: '帮助学生理解线粒体遗传咨询的家系重点在母系，而非父系。',
-      interpretationHint: '应重视母系亲属的风险提示与后续咨询。'
+      resultTitle: '家系风险评估结果',
+      resultText: '进一步追问家族史后发现，母系亲属中有年轻时视力明显下降者；若遗传检测支持LHON，应重点评估母系亲属风险并进行遗传咨询。父系家族目前缺乏类似线索。',
+      teachingValue: '帮助学生理解线粒体遗传咨询的家系重点在母系，但母系线索应通过问诊或家系评估获得。',
+      interpretationHint: '应在完成眼科表型确认后，主动追问家族史并识别母系传递线索。'
     },
     {
       testId: 'test_case8_visual_field',
@@ -2516,7 +2516,7 @@ case8: {
       allowRepeat: false,
       prerequisites: [],
       resultTitle: '视野与视功能评估结果',
-      resultText: '结果支持中心视功能受损，与 LHON 临床表现相符。',
+      resultText: '结果支持中心视功能受损，符合视神经病变相关表现；该检查只能作为临床支持证据，不能替代遗传学确认。',
       teachingValue: '作为临床支持性证据，但不能替代遗传学确认。',
       interpretationHint: '对诊断有帮助，但解释遗传方式仍需结合家族与分子结果。'
     },
@@ -3268,20 +3268,13 @@ function keywordIncludes(question, keywords) {
 }
 
 function isReportRequest(question) {
-  const q = (question || '').trim().toLowerCase();
-  return keywordIncludes(q, [
-    '报告',
-    '病历',
-    '外院资料',
-    '检查结果',
-    '既往检查',
-    '之前检查',
-    '带了吗',
-    '带来了吗',
-    '给我看看',
-    '调取',
-    '复核'
-  ]);
+  const q = String(question || '').toLowerCase().replace(/\s+/g, '');
+  const hasMaterialObject = keywordIncludes(q, ['报告', '病历', '资料', '记录', '检查单']);
+  const hasPriorContext = keywordIncludes(q, ['以前', '之前', '既往', '外院', '原来', '过去', '带了', '带来', '已有', '做过']);
+  const hasViewIntent = keywordIncludes(q, ['有没有', '有没有带', '有带', '带了吗', '带来了吗', '能看看', '给我看看', '可以看', '查看', '看一下', '调取', '复核', '提供', '提交']);
+  const asksPriorExamHistory = keywordIncludes(q, ['以前做过什么检查', '之前做过什么检查', '既往做过什么检查', '以前做过哪些检查', '之前做过哪些检查', '查过什么']);
+
+  return (hasMaterialObject && (hasPriorContext || hasViewIntent)) || asksPriorExamHistory;
 }
 
 function getReportRequestReply(caseId) {
@@ -3307,6 +3300,32 @@ function isTerminationRequest(caseId, question) {
 
 function getTerminationConcernReply() {
   return '医生，我现在很害怕后续结果不好，但也不想在还没有明确诊断前仓促做决定。您能不能先帮我把确诊流程、可能结果和可选择方案讲清楚？我希望在充分了解信息以后，再和家人一起慎重考虑。';
+}
+
+function hasConfirmedDownDiagnosis(history = []) {
+  const textHistory = (history || [])
+    .map(item => {
+      if (typeof item === 'string') return item;
+      return `${item.role || ''}:${item.content || ''}`;
+    })
+    .join(' ')
+    .toLowerCase();
+
+  return (
+    textHistory.includes('47,xx,+21') ||
+    textHistory.includes('47，xx，+21') ||
+    textHistory.includes('胎儿核型结果') ||
+    textHistory.includes('羊水穿刺胎儿染色体核型分析') ||
+    (textHistory.includes('羊水穿刺') && textHistory.includes('21三体') && textHistory.includes('确诊')) ||
+    textHistory.includes('孩子确实是21三体') ||
+    textHistory.includes('胎儿确实被诊断为21三体') ||
+    textHistory.includes('胎儿患21三体') ||
+    textHistory.includes('诊断为21三体综合征')
+  );
+}
+
+function getPostDiagnosisDownDecisionReply() {
+  return '医生，我现在听到确诊结果真的很难受，也很害怕接下来要做选择。您能不能先帮我讲清楚21三体可能带来的健康和发育影响、继续妊娠和终止妊娠各自需要了解什么？我想和家人一起在充分知情后慎重决定。';
 }
 
 function generateCase3EnhancedMockReply(caseData, question, history = []) {
@@ -3922,6 +3941,7 @@ function generateCase4EnhancedMockReply(caseData, question, history = []) {
     })
     .join(' ')
     .toLowerCase();
+  const confirmedDownDiagnosis = hasConfirmedDownDiagnosis(history);
 
   const askedWeeks =
     q.includes('怀孕多久') ||
@@ -3987,6 +4007,34 @@ function generateCase4EnhancedMockReply(caseData, question, history = []) {
 
   function pick(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  if (confirmedDownDiagnosis) {
+    if (
+      q.includes('终止妊娠') ||
+      q.includes('引产') ||
+      q.includes('不要这个孩子') ||
+      q.includes('能不能要') ||
+      q.includes('不能要') ||
+      askedPlan
+    ) {
+      return getPostDiagnosisDownDecisionReply();
+    }
+    if (
+      askedNeedDiagnosis ||
+      q.includes('结果') ||
+      q.includes('确诊') ||
+      q.includes('唐氏') ||
+      q.includes('21三体')
+    ) {
+      return '医生，我明白现在已经不是筛查阶段了，羊水穿刺核型结果说明胎儿确诊为21三体。只是这个结果对我们冲击很大，您能不能再帮我讲清楚这个诊断意味着什么、严重程度会不会有差异、后面还需要评估哪些问题？';
+    }
+    if (askedUltrasound || q.includes('胎儿心脏')) {
+      return '如果已经确诊了，我也想知道后面做系统超声、胎儿心脏超声这些检查，是不是主要为了了解有没有合并结构异常、帮助我们判断继续妊娠时需要准备什么？';
+    }
+    if (askedEmotion || askedRisk) {
+      return '医生，我现在确实很害怕，也担心自己和家人承受不了。您能不能一边把医学情况讲清楚，一边告诉我有哪些支持和选择？我不想仓促决定，但也希望现实一点。';
+    }
   }
 
   const fallbackReplies = [
@@ -4223,7 +4271,7 @@ function generateCase7EnhancedMockReply(caseData, question, history = []) {
   }
 
   if (askedRisk) {
-    return '这就是我们最担心的地方。已经有过一个孩子这样了，那下一个孩子是不是风险会比别人高？';
+    return '这就是我们最担心的地方。已经有过一个孩子这样了，那下一个孩子是不是风险会比别人高？大概有没有一个比例，我们心里也好有点准备。';
   }
 
   if (askedPlan) {
@@ -4838,7 +4886,9 @@ app.post('/api/chat', async (req, res) => {
     const reportRequest = isReportRequest(message);
 
     if (isTerminationRequest(caseId, message)) {
-      reply = getTerminationConcernReply();
+      reply = hasConfirmedDownDiagnosis(history)
+        ? getPostDiagnosisDownDecisionReply()
+        : getTerminationConcernReply();
       actualMode = currentMode === 'ai' ? 'ai-ethics-rule' : 'mock-ethics-rule';
     } else if (reportRequest) {
       reply = getReportRequestReply(caseId);

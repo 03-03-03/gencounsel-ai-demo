@@ -801,12 +801,13 @@
         patientProfile: { name: '孙女士', age: 30, gender: '女', maritalStatus: '已婚，既往一胎唇腭裂' },
         opening: '医生您好，我第一个孩子出生后发现唇腭裂。我们还想再要一个孩子，但很担心下一胎还会不会这样。',
         chiefConcern: '既往子代唇腭裂后的再发风险和孕前/孕期管理。',
-        localBrief: '既往一胎非综合征性唇腭裂，关注多因素再发风险。',
+        localBrief: '既往一胎唇腭裂，关注下一胎再发风险和孕前/孕期管理。',
         tests: [
-          { testId: 'case7_child_record', name: '患儿病历和表型资料复核', type: 'information', resultTitle: '患儿资料复核', resultText: '患儿表现以唇腭裂为主，暂无明确综合征性线索。', teachingValue: '先区分综合征性和非综合征性唇腭裂。' },
-          { testId: 'case7_ultrasound', name: '孕期目标超声评估', type: 'laboratory', resultTitle: '目标超声', resultText: '可在合适孕周重点观察颜面结构。', teachingValue: '孕期超声可帮助发现部分结构异常。' },
-          { testId: 'case7_panel', name: '必要时遗传检测评估', type: 'genetic', resultTitle: '遗传检测评估', resultText: '若伴随其他畸形或发育异常，可考虑进一步检测；单纯病例需说明检测局限。', teachingValue: '多因素疾病咨询应避免过度承诺。' },
-          { testId: 'case7_blood', name: '父母血常规', type: 'distractor', resultTitle: '血常规', resultText: '未见特异性异常。', teachingValue: '对再发风险评估帮助有限。' }
+          { testId: 'case7_child_record', name: '调取第一胎患儿病历和表型资料', type: 'information', resultTitle: '第一胎患儿资料复核', resultText: '患儿出生记录和手术资料提示唇裂合并腭裂；目前资料未见明确心脏、四肢、智力发育异常等综合征性线索。', teachingValue: '本病例第一步是复核患儿表型，先判断是否更像孤立性/非综合征性唇腭裂。' },
+          { testId: 'case7_family_risk', name: '家系与再发风险综合评估', type: 'information', resultTitle: '家系与再发风险综合评估', resultText: '双方近亲中未见明确类似病例；结合既往已有一名唇腭裂患儿，目前更符合多因素风险背景。再次妊娠经验再发风险约为3%-5%，需结合患儿严重程度、是否双侧、家族史和环境因素进一步修正；风险升高但不是一定再发。', teachingValue: '帮助学生理解多因素遗传病咨询重在概率解释和综合风险管理，而非简单孟德尔遗传判断。' },
+          { testId: 'case7_prepregnancy', name: '孕前风险因素与叶酸补充评估', type: 'information', resultTitle: '孕前管理评估', resultText: '建议规范孕前准备，尽早规律补充叶酸，避免吸烟、饮酒、致畸药物及其他可干预不良暴露，并在计划妊娠前进行产前遗传咨询。', teachingValue: '突出再生育咨询不仅要解释风险，还要给出可执行的孕前管理建议。' },
+          { testId: 'case7_ultrasound', name: '下一胎孕期目标超声筛查方案', type: 'laboratory', resultTitle: '孕期目标超声筛查方案', resultText: '下一胎妊娠时可在合适孕周进行系统超声和颜面部结构重点评估；超声可发现部分唇腭部结构异常，但不能保证排除所有轻微或隐匿异常。', teachingValue: '孕期目标超声是再生育管理的重要环节，但需说明其局限。' },
+          { testId: 'case7_couple_karyotype', name: '夫妻双方外周血核型分析', type: 'distractor', resultTitle: '夫妻双方外周血核型分析', resultText: '夫妻双方外周血核型未见明显异常。该结果对当前孤立性唇腭裂再发风险评估帮助有限，不能替代患儿表型复核和综合风险评估。', teachingValue: '这是干扰项，用于提醒学生不要把所有出生缺陷都优先归入染色体异常路径。' }
         ]
       },
       case8: {
@@ -817,11 +818,11 @@
         patientProfile: { name: '吴先生', age: 24, gender: '男', maritalStatus: '未婚' },
         opening: '医生您好，我最近视力下降，眼科医生说可能和视神经以及遗传因素有关。我想知道这到底是什么问题，会不会影响家里人和以后孩子。',
         chiefConcern: '青年视力下降的遗传学诊断确认、家族风险和生育咨询。',
-        localBrief: '青年男性视力下降，眼科提示视神经受累；诊断和遗传方式需结合眼科资料、母系家族史和线粒体DNA检测。',
+        localBrief: '青年男性视力下降，眼科提示视神经受累；诊断和遗传方式需结合眼科资料、家族史和线粒体DNA检测。',
         tests: [
           { testId: 'case8_mtdna', name: '线粒体DNA视神经病相关变异检测', type: 'genetic', resultTitle: '线粒体DNA检测', resultText: '检出LHON相关常见致病变异，支持Leber遗传性视神经病变诊断。', teachingValue: 'LHON通常涉及线粒体DNA变异和母系遗传。' },
-          { testId: 'case8_eye', name: '眼科专科评估', type: 'laboratory', resultTitle: '眼科评估', resultText: '视神经受累表现与LHON相符。', teachingValue: '临床表型与遗传检测需综合判断。' },
-          { testId: 'case8_maternal', name: '母系亲属风险资料收集', type: 'information', resultTitle: '母系家系评估', resultText: '母系家族有视力下降线索，建议母系亲属进行咨询。', teachingValue: '线粒体遗传重点关注母系传递。' },
+          { testId: 'case8_eye', name: '眼科专科评估', type: 'laboratory', resultTitle: '眼科评估', resultText: '眼科资料提示双眼中心视力下降和视神经受累表现，需考虑遗传性视神经病变可能；不能仅凭眼科表现完成遗传学诊断。', teachingValue: '临床表型可提示诊断方向，但需结合家族史和遗传检测综合判断。' },
+          { testId: 'case8_maternal', name: '家族史与亲属风险资料收集', type: 'information', resultTitle: '家系风险评估', resultText: '进一步追问家族史后发现，母系亲属中有年轻时视力明显下降者；若遗传检测支持LHON，应重点评估母系亲属风险并进行遗传咨询。', teachingValue: '线粒体遗传重点关注母系传递，但该线索应通过家族史问诊或家系评估获得。' },
           { testId: 'case8_karyotype', name: '外周血染色体核型分析', type: 'distractor', resultTitle: '染色体核型', resultText: '未见明显异常。', teachingValue: '不能解释典型LHON线索。' }
         ]
       },
@@ -952,8 +953,8 @@
             '材料名称：眼科专科检查资料',
             '主诉：近期中心视力下降。',
             '眼科提示：视神经受累表现，建议结合遗传因素进一步评估。',
-            '家族线索：母系亲属中有年轻时视力明显下降者。',
-            '教学提示：该资料提示需考虑线粒体DNA相关视神经病，并追问母系家族史。'
+            '报告结论：眼科表现提示视神经受累，需结合病史、家族史和遗传学检测进一步评估。',
+            '教学提示：该资料只提供眼科表型线索；是否存在母系家族史应由学生继续问诊获得。'
           ]
         }
       ],
@@ -1193,22 +1194,12 @@
 
     function isAskingForPriorReports(text) {
       const q = normalizeText(text);
-      return includesAny(q, [
-        '以前的检查',
-        '之前的检查',
-        '既往检查',
-        '检查报告',
-        '报告',
-        '病历',
-        '病例资料',
-        '外院资料',
-        '外院报告',
-        '带来了吗',
-        '带了吗',
-        '给我看看',
-        '调取',
-        '复核'
-      ]);
+      const hasMaterialObject = includesAny(q, ['报告', '病历', '资料', '记录', '检查单']);
+      const hasPriorContext = includesAny(q, ['以前', '之前', '既往', '外院', '原来', '过去', '带了', '带来', '已有', '做过']);
+      const hasViewIntent = includesAny(q, ['有没有', '有没有带', '有带', '带了吗', '带来了吗', '能看看', '给我看看', '可以看', '查看', '看一下', '调取', '复核', '提供', '提交']);
+      const asksPriorExamHistory = includesAny(q, ['以前做过什么检查', '之前做过什么检查', '既往做过什么检查', '以前做过哪些检查', '之前做过哪些检查', '查过什么']);
+
+      return (hasMaterialObject && (hasPriorContext || hasViewIntent)) || asksPriorExamHistory;
     }
 
     function getTriggeredLocalMaterial(caseId, text) {
@@ -1349,6 +1340,34 @@
       }
 
       if (caseData.caseId === 'case4') {
+        const case4HistoryText = normalizeText(conversationHistory.map(item => item.content || '').join(' '));
+        const case4Confirmed = completedTests.includes('case4_amniocentesis_karyotype') ||
+          includesAny(case4HistoryText, ['47,xx,+21', '47，xx，+21', '胎儿核型结果', '羊水穿刺胎儿染色体核型分析', '确诊为21三体', '孩子确实是21三体', '胎儿患21三体', '诊断为21三体综合征']);
+
+        if (case4Confirmed) {
+          if (includesAny(q, ['终止妊娠', '不要这个孩子', '引产', '必须终止', '能不能要', '不能要', '继续妊娠', '选择', '怎么办', '下一步'])) {
+            return pickLocalReply([
+              '医生，我现在听到确诊结果真的很难受，也很害怕接下来要做选择。您能不能先帮我讲清楚继续妊娠和终止妊娠各自需要了解什么？我想和家人一起在充分知情后慎重决定。',
+              '我不希望医生替我直接决定，但也不想逃避现实。您能不能把疾病影响、后续检查、可选择方案和支持资源都讲清楚，让我们回去认真商量？'
+            ]);
+          }
+          if (includesAny(q, ['结果', '确诊', '诊断', '21三体', '唐氏'])) {
+            return pickLocalReply([
+              '我明白现在已经不是筛查阶段了，羊水穿刺结果说明胎儿确诊为21三体。只是这个结果对我们冲击很大，您能不能再帮我讲清楚这个诊断意味着什么、严重程度会不会有差异？',
+              '听到确诊以后我心里很乱。您能不能把21三体可能带来的发育和健康问题讲得更清楚一点，也告诉我还需要评估哪些情况？'
+            ]);
+          }
+          if (includesAny(q, ['超声', '胎儿心脏', '结构', '畸形'])) {
+            return '如果已经确诊了，我也想知道后面做系统超声、胎儿心脏超声这些检查，是不是主要为了了解有没有合并结构异常、帮助我们判断继续妊娠时需要准备什么？';
+          }
+          if (dialogueState.addressedAnxiety || includesAny(q, ['害怕', '焦虑', '难受', '担心'])) {
+            return pickLocalReply([
+              '谢谢您理解我。我现在确实很难受，也担心自己和家人承受不了。您能不能一边把医学情况讲清楚，一边告诉我有哪些支持和选择？',
+              '我现在不想仓促决定，但也希望现实一点。您继续帮我解释吧，我想先听清楚，再和家人一起慎重考虑。'
+            ]);
+          }
+        }
+
         if (includesAny(q, ['终止妊娠', '不要这个孩子', '引产', '必须终止'])) {
           return pickLocalReply([
             '我最害怕的就是这个问题，所以刚才一看到高风险就慌了。听您这么说，我理解现在还不能只凭筛查就做决定，还是要先把诊断弄清楚。',
@@ -1481,7 +1500,7 @@
           return '上一次怀孕早期我没有特别规范补充叶酸，也不记得有明显接触有害物。现在想再怀孕，就想把能注意的都提前做好。';
         }
         if (includesAny(q, ['再发', '风险', '下一胎'])) {
-          return '我们最想知道下一胎风险大不大。也想知道有没有什么检查能在孕期早点看出来。';
+          return '我们最想知道下一胎风险大不大，大概有没有一个比例。也想知道有没有什么办法能提前准备，或者在孕期早点看出来。';
         }
       }
 
@@ -1658,16 +1677,16 @@
         },
         case7: {
           conceptTerms: ['唇腭裂', '多因素', '再发风险', '综合征性', '非综合征性', '叶酸', '孕前', '目标超声', '环境因素', '遗传咨询'],
-          keyTests: ['case7_child_record'],
-          supportiveTests: ['case7_ultrasound', 'case7_panel'],
-          distractorTests: ['case7_blood'],
+          keyTests: ['case7_child_record', 'case7_family_risk'],
+          supportiveTests: ['case7_prepregnancy', 'case7_ultrasound'],
+          distractorTests: ['case7_couple_karyotype'],
           pathwayName: '复核患儿表型资料，区分综合征性与非综合征性，再讨论再发风险和孕期筛查',
           diagnosisName: '非综合征性唇腭裂倾向的多因素再发风险咨询',
           testStrength: '检查路径能先复核患儿表型，再决定是否需要进一步遗传检测和孕期目标超声。',
           conceptStrength: '能认识唇腭裂常涉及多因素遗传和环境因素，再发风险不能简单归为单基因病。',
           missingConcept: '尚需区分综合征性和非综合征性唇腭裂，并说明再发风险是概率评估而非绝对预测。',
           missingPathway: '建议先复核患儿病历和表型资料，孕前做好风险因素管理，孕期进行目标超声评估。',
-          sample: '可以这样表达：孩子的唇腭裂需要先判断是否有其他畸形或发育异常。如果目前更像非综合征性唇腭裂，通常属于多因素风险，下一胎风险会比普通人群升高但不是一定再发。建议复核孩子资料，孕前补充叶酸并减少可干预风险因素，孕期做针对颜面结构的目标超声。',
+          sample: '可以这样表达：孩子的唇腭裂需要先判断是否有其他畸形或发育异常。如果目前更像非综合征性唇腭裂，通常属于多因素风险；已有一个患儿后，下一胎经验再发风险大约为3%-5%，会比普通人群升高，但不是一定再发。建议复核孩子资料，孕前规律补充叶酸并减少可干预风险因素，孕期做针对颜面结构的目标超声。',
           nextGoal: '下次训练目标：完成“患儿表型复核、综合征性判断、多因素风险解释、孕前孕期管理”四步咨询。'
         },
         case8: {
@@ -1730,9 +1749,10 @@
         test_case6_psych_eval: ['case6_psych'],
         test_case6_brain_mri: ['case6_ct'],
         test_case7_child_record: ['case7_child_record'],
+        test_case7_family_risk_assessment: ['case7_family_risk'],
         test_case7_targeted_ultrasound_plan: ['case7_ultrasound'],
-        test_case7_prepregnancy_guidance: ['case7_panel'],
-        test_case7_couple_karyotype: ['case7_blood'],
+        test_case7_prepregnancy_guidance: ['case7_prepregnancy'],
+        test_case7_couple_karyotype: ['case7_couple_karyotype'],
         test_case8_eye_record: ['case8_eye'],
         test_case8_mtDNA_test: ['case8_mtdna'],
         test_case8_family_assessment: ['case8_maternal'],
