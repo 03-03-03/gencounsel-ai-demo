@@ -618,16 +618,16 @@ const CASE_LIBRARY = {
     tests: [
       {
         testId: 'test_uncle_record',
-        name: '获取患病亲属病历及F8变异报告',
+        name: '获取患病亲属病历及凝血因子资料',
         type: 'information',
         available: true,
         recommendedPriority: 1,
         allowRepeat: false,
         prerequisites: [],
-        resultTitle: '患病亲属病历及F8变异报告',
-        resultText: '既往资料提示：患者舅舅凝血因子Ⅷ活性明显降低，结合临床表现诊断为血友病A；补充基因报告显示该家系存在F8致病变异。',
-        teachingValue: '明确患病亲属的具体病种和家系致病变异，避免仅凭模糊病史推断。',
-        interpretationHint: '该结果支持当前家系属于血友病A相关家系，并为患者本人开展F8家系变异针对性检测提供依据。'
+        resultTitle: '患病亲属病历及凝血因子资料',
+        resultText: '既往资料提示：患者舅舅凝血因子Ⅷ活性明显降低，结合临床表现诊断为血友病A；资料中未见可直接复核的家系致病变异报告。',
+        teachingValue: '明确患病亲属的具体病种，避免仅凭模糊病史推断。',
+        interpretationHint: '该结果支持当前家系属于血友病A相关家系，但患者本人是否为携带者仍需进一步遗传学检测评估。'
       },
       {
         testId: 'test_patient_bleeding_lab',
@@ -663,7 +663,7 @@ const CASE_LIBRARY = {
         recommendedPriority: 4,
         allowRepeat: false,
         prerequisites: ['test_uncle_record'],
-        resultTitle: '患者本人F8家系变异检测结果',
+        resultTitle: '患者本人F8基因检测结果',
         resultText: '基因检测发现患者携带F8基因致病变异，为血友病A携带者。',
         teachingValue: '这是本病例最关键的确认性检查之一，用于确认患者是否为携带者。',
         interpretationHint: '若患者为携带者，则后代风险具有明显的性别差异。'
@@ -705,7 +705,7 @@ const CASE_LIBRARY = {
         resultTitle: '非定向扩展遗传检测结果',
         resultText: '本次进一步遗传学评估未提供比针对性检测更明确、更直接的临床增益，当前结果对本次咨询推进有限。',
         teachingValue: '提示学生：并不是检测范围越大越合理。',
-        interpretationHint: '在已有明确家系F8变异线索时，优先做针对性检测；盲目扩大检测范围容易造成过度检查和结果解释负担。'
+        interpretationHint: '在已有明确血友病A家系线索时，优先围绕F8基因进行针对性评估；盲目扩大检测范围容易造成过度检查和结果解释负担。'
       }
     ],
 
@@ -1304,19 +1304,19 @@ const CASE_LIBRARY = {
 
     externalMaterials: [
   {
-    materialId: 'material_case3_karyotype_report',
-    title: '夫妻双方外周血核型分析报告',
+    materialId: 'material_case3_poc_record',
+    title: '既往流产就诊与流产组织资料',
     type: 'report',
     source: '外院检查材料',
     availableInChat: true,
-    summary: '女方核型：46,XX；男方核型：46,XY,t(11;22)(q23;q11)。',
+    summary: '既往3次早孕期自然流产，未见完整可复核的胚胎染色体或拷贝数检测结果。',
     detail: [
-      '报告名称：夫妻双方外周血核型分析报告',
-      '送检项目：夫妻双方外周血核型分析',
-      '结果摘要：女方核型 46,XX；男方核型 46,XY,t(11;22)(q23;q11)',
-      '结果提示：男方为平衡易位携带者，本人可无明显异常，但生殖过程中可增加胚胎异常和自然流产风险。'
+      '报告名称：既往流产就诊与流产组织资料',
+      '资料来源：外院妇产科门诊和住院记录复印件',
+      '结果摘要：既往3次早孕期自然流产，孕周约7-10周；未见完整可复核的胚胎染色体或拷贝数检测结果。',
+      '补充信息：外院曾建议夫妻双方进一步行外周血染色体核型分析，但资料中未见已完成报告。'
     ],
-    teachingHint: '该材料属于患者既往外院资料，学生应主动查看并结合问诊解释其意义。'
+    teachingHint: '该材料提示反复流产需要系统评估；核心遗传学病因仍需由学生主动提出并选择夫妻双方核型分析。'
   }
 ],
 
@@ -3017,7 +3017,7 @@ function detectCase3MaterialCard(caseData, question) {
   const materialMap = {
     case1: { materialId: 'local_case1_relative_record', title: '患病亲属既往病历资料' },
     case2: { materialId: 'local_case2_premarital_cbc', title: '夫妻婚前体检血常规资料' },
-    case3: { materialId: 'local_case3_karyotype_report', title: '夫妻双方外周血核型分析报告' },
+    case3: { materialId: 'local_case3_poc_record', title: '既往流产就诊与流产组织资料' },
     case4: { materialId: 'local_case4_screening_reports', title: '既往唐氏筛查与NIPT报告' },
     case6: { materialId: 'local_case6_father_record', title: '父亲外院神经系统疾病资料' },
     case7: { materialId: 'local_case7_child_record', title: '一胎患儿病历与手术记录' },
@@ -3285,7 +3285,7 @@ function getReportRequestReply(caseId) {
   const replies = {
     case1: '我带了一些亲属以前的病历资料，但我自己看不太懂。好像里面提到凝血方面有异常，您可以先帮我看看具体说明什么吗？',
     case2: '体检报告我带来了，主要是血常规和红细胞指数那些内容。医生当时只是说不像单纯看血红蛋白就能解释，建议我们进一步查。',
-    case3: '带了，是之前外院做的一份检查报告，但我自己看不太懂。您可以先看看具体写了什么，再帮我们解释吗？',
+    case3: '带了，是之前流产时的一些就诊记录和处理资料，但我自己看不太懂。您可以先看看具体写了什么，再帮我们判断下一步该查什么吗？',
     case4: '唐筛和无创的报告我都带来了。报告上写的是高风险，我特别想知道这是不是已经能算确诊。',
     case5: '我这次没有带正式报告，只记得前面外院做过初步评估，说可能和发育或染色体有关，建议我进一步查。还没有最终诊断，我也不太懂该先查什么。',
     case6: '父亲的外院资料我带来了，但我自己看不太懂。医生说像是一种可能和遗传有关的神经系统问题，所以我才来问自己和以后孩子的风险。',
