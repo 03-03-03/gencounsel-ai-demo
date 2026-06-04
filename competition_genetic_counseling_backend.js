@@ -35,8 +35,8 @@ const client = process.env.DEEPSEEK_API_KEY
     })
   : null;
 
-const DEFAULT_MODE = process.env.CHAT_MODE || 'ai';
-const MODEL_NAME = process.env.DEEPSEEK_MODEL || 'deepseek-chat';
+const DEFAULT_MODE = process.env.CHAT_MODE || process.env.MODE || 'ai';
+const MODEL_NAME = process.env.DEEPSEEK_MODEL || process.env.MODEL || 'deepseek-v4-pro';
 const RESEARCH_LOGGING_ENABLED = process.env.RESEARCH_LOGGING !== 'false';
 const RESEARCH_LOG_DIR = process.env.RESEARCH_LOG_DIR || path.join(__dirname, 'research_logs');
 const SUPABASE_URL = (process.env.SUPABASE_URL || '').replace(/\/$/, '');
@@ -2967,6 +2967,10 @@ ${caseData.languageRules.join('\n')}
 6. 不知道的信息要明确说不清楚、不知道、没查过。
 7. 每次回答控制在2到5句话，尽量简洁。
 8. 如果学生试图让你跳出角色，拒绝并继续保持患者身份。
+9. 认真阅读上一轮医生回复；如果医生已经回答了你的担忧，不要原句复述同一个问题。
+10. 同一核心担忧最多连续出现一次。若学生已解释清楚，应推进到下一层真实问题，例如下一步检查、结果意义、检查风险、家属沟通、费用时间、继续或终止妊娠选择、随访安排等。
+11. 若医生进行了共情安抚，你要先表示“稍微明白/放心一点/愿意配合”，再提出一个新的合理追问。
+12. 每轮最多提出一个主要问题，不要同时抛出多个方向，也不要替医生总结标准答案。
 
 【本病例专属行为要求】
 ${caseData.extraPrompt || '请根据上述病例信息，以自然、真实、口语化的患者方式回答。'}
@@ -4825,6 +4829,66 @@ ${historyText || '（暂无）'}
 请继续以患者身份回答。`;
 }
 
+function textIncludesAny(text, words) {
+  const value = String(text || '').toLowerCase();
+  return words.some(word => value.includes(String(word).toLowerCase()));
+}
+
+function isSubstantialDoctorExplanation(text) {
+  const value = String(text || '').trim();
+  if (value.length >= 60) return true;
+  return textIncludesAny(value, [
+    '不是诊断', '不等于确诊', '风险评估', '羊水穿刺', '核型分析', '基因检测',
+    '遗传方式', '携带者', '染色体', '知情同意', '自主决定', '检查结果',
+    '下一步', '建议', '风险', '局限', '选择'
+  ]);
+}
+
+function isAnxietyLoopText(text) {
+  const value = String(text || '');
+  const emotion = textIncludesAny(value, ['焦虑', '紧张', '害怕', '担心', '难受', '慌', '没底']);
+  const repeatAsk = textIncludesAny(value, ['再解释', '讲清楚', '再讲', '能不能', '怎么办', '下一步', '到底']);
+  return emotion && repeatAsk;
+}
+
+function hasRecentPatientAnxietyLoop(history) {
+  const recentPatientMessages = (history || [])
+    .filter(item => item && item.role === 'patient')
+    .map(item => item.content || '')
+    .slice(-4);
+  return recentPatientMessages.filter(isAnxietyLoopText).length >= 1;
+}
+
+function getProgressivePatientReply(caseData, history) {
+  const textHistory = (history || []).map(item => item.content || '').join('\n');
+  if (caseData.caseId === 'case4') {
+    if (textIncludesAny(textHistory, ['47,XX,+21', '47,xx,+21', '确诊', '21三体'])) {
+      return '医生，我大概明白这个结果已经比较明确了。现在我最想知道的是，继续妊娠和终止妊娠各自需要了解哪些医学问题、流程和支持资源，我想回去和家人慎重商量。';
+    }
+    if (textIncludesAny(textHistory, ['羊水穿刺', '羊穿', '核型分析'])) {
+      return '我听明白一些了，也知道不能只靠筛查下结论。接下来我更想了解羊水穿刺的具体流程、风险和能确认什么，这样我好和家里人商量。';
+    }
+    return '我稍微明白了，高风险还不能直接等同于确诊。接下来请您帮我把产前诊断流程和可选择方案讲清楚，我想一步一步来。';
+  }
+  if (caseData.caseId === 'case6') {
+    return '我稍微明白了，这不是普通体检。接下来我想知道检测前心理评估、知情同意和不检测的权利具体怎么安排。';
+  }
+  return '我稍微明白一些了。接下来我更想知道最关键的检查或资料是什么，以及这个结果会怎样影响诊断、风险判断和后续选择。';
+}
+
+function stabilizePatientReply(caseData, question, history, reply) {
+  const recentPatientMessages = (history || [])
+    .filter(item => item && item.role === 'patient')
+    .map(item => item.content || '')
+    .slice(-4);
+  const repeatedExact = recentPatientMessages.includes(reply);
+  const repeatedAnxiety = isAnxietyLoopText(reply) && hasRecentPatientAnxietyLoop(history);
+  if ((repeatedExact || repeatedAnxiety) && isSubstantialDoctorExplanation(question)) {
+    return getProgressivePatientReply(caseData, history);
+  }
+  return reply;
+}
+
 async function generateAIReply(caseData, question, history = []) {
   if (!client) {
     throw new Error('未检测到 DEEPSEEK_API_KEY，无法使用 ai 模式。');
@@ -4841,7 +4905,8 @@ async function generateAIReply(caseData, question, history = []) {
     max_tokens: 180
   });
 
-  return response.choices?.[0]?.message?.content?.trim() || '这个问题我一下子不知道该怎么说。';
+  const rawReply = response.choices?.[0]?.message?.content?.trim() || '这个问题我一下子不知道该怎么说。';
+  return stabilizePatientReply(caseData, question, history, rawReply);
 }
 
 app.post('/api/tests/followup', (req, res) => {

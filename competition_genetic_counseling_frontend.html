@@ -632,7 +632,7 @@
           <div class="demo-buttons" aria-label="推荐演示输入">
             <button class="secondary" type="button" data-demo="opening">开场问诊</button>
             <button class="secondary" type="button" data-demo="explain">关键解释</button>
-            <button class="secondary" type="button" data-demo="amniocentesis">羊穿说明</button>
+            <button class="secondary" type="button" data-demo="test">检查说明</button>
             <button class="secondary" type="button" data-demo="consent">知情同意</button>
           </div>
           <p class="muted">按 Enter 发送，按 Shift + Enter 换行。后端不可用时将自动启用本地静态演示模式。</p>
@@ -847,8 +847,60 @@
     const LOCAL_DEMO_INPUTS = {
       opening: '您好，我先了解一下情况。您现在孕周大约是多少？这次筛查报告具体写的是唐氏筛查高风险、NIPT高风险，还是两项都有？您现在最担心的问题是什么？',
       explain: '我理解您看到“高风险”会非常紧张。需要先说明，唐氏筛查是筛查，不是诊断；高风险不等于已经确诊。NIPT比传统筛查更准确，但本质上仍然是风险评估，不能作为最终诊断依据。',
-      amniocentesis: '下一步建议进行遗传咨询并讨论产前诊断。以您目前孕16到17周的情况，通常可以考虑羊水穿刺，获取胎儿细胞后做染色体核型分析或相应遗传学检测，用来明确胎儿是否存在21三体。',
+      test: '下一步建议进行遗传咨询并讨论产前诊断。以您目前孕16到17周的情况，通常可以考虑羊水穿刺，获取胎儿细胞后做染色体核型分析或相应遗传学检测，用来明确胎儿是否存在21三体。',
       consent: '是否做羊水穿刺、如何面对后续结果，都需要在充分了解收益、风险、局限和替代方案后由您和家属自主决定。我们不会因为筛查高风险就直接建议终止妊娠，而是先把诊断和选择讲清楚，陪您一步一步判断。'
+    };
+
+    const LOCAL_DEMO_INPUTS_BY_CASE = {
+      case1: {
+        opening: '您好，我先了解一下情况。家族里具体是哪位亲属有出血问题？有没有明确诊断为血友病A，或者有凝血因子和基因检测报告？',
+        explain: '从遗传咨询角度看，血友病A多与F8基因相关，常见为X连锁遗传。女性可能是携带者但症状不明显，所以需要先确认家系中的具体诊断和致病变异。',
+        test: '建议先复核患病亲属病历和凝血因子结果，再做家系F8变异的针对性检测，并结合您的凝血功能评估携带者风险。',
+        consent: '检测前我会把检测目的、可能结果、局限和对婚育决策的影响讲清楚。是否检测、何时检测以及后续生育选择，都应由您在充分知情后决定。'
+      },
+      case2: {
+        opening: '您好，我先了解一下双方情况。你们之前血常规有没有提示MCV或MCH偏低？双方有没有做过地中海贫血筛查或基因检测？',
+        explain: '小细胞低色素只是提示线索，不能直接确诊地中海贫血。关键要看双方是否携带同一类型相关变异，因为这会影响后代重型地贫风险。',
+        test: '建议按血常规红细胞指数、铁代谢鉴别、HbA2或血红蛋白分析、夫妻双方地贫基因检测的路径来判断风险。',
+        consent: '我会把筛查和基因检测的目的、可能结果、局限及对生育选择的影响说明清楚，再由你们共同决定是否进一步检查。'
+      },
+      case3: {
+        opening: '您好，我先了解一下既往流产情况。每次大概孕几周流产？有没有保留流产组织检查结果？夫妻双方有没有做过染色体核型分析？',
+        explain: '反复早孕流产是多因素问题，可能与胚胎染色体异常、夫妻一方平衡易位、子宫结构或内分泌免疫因素有关，需要分层评估。',
+        test: '遗传学评估建议优先做夫妻双方外周血染色体核型分析，同时复核既往流产组织资料，必要时结合子宫和内分泌等基础评估。',
+        consent: '检查结果可能影响后续自然妊娠、产前诊断或胚胎植入前遗传学检测等选择，我会先说明利弊和局限，再和你们共同讨论下一步。'
+      },
+      case4: LOCAL_DEMO_INPUTS,
+      case5: {
+        opening: '您好，我先了解一下月经和生长发育情况。您从来没有来过月经吗？身高增长、青春期发育以及既往超声检查情况如何？',
+        explain: '原发闭经合并身材矮小需要考虑性染色体相关原因，例如Turner综合征，但仍需要通过染色体核型和相关检查明确。',
+        test: '建议先做外周血染色体核型分析，同时结合盆腔超声了解子宫卵巢发育，并筛查心脏、肾脏和内分泌代谢情况。',
+        consent: '这些检查不仅关系到诊断，也关系到长期健康管理和生育力咨询。检查前我会说明目的、可能结果和隐私保护，再由您决定。'
+      },
+      case6: {
+        opening: '您好，我先了解一下家族情况。您父亲是否已经明确诊断Huntington病？有没有HTT基因CAG重复扩增报告？您现在有没有相关症状？',
+        explain: 'Huntington病常为成人发病的常染色体显性遗传病。无症状亲属预测性检测不是普通体检，需要特别重视心理影响和不检测权利。',
+        test: '建议先复核父亲诊断和HTT检测报告，再进行检测前遗传咨询和心理评估，确认您是否真的希望进行预测性检测。',
+        consent: '是否做预测性检测必须由您充分知情后自主决定，也包括暂时不检测的权利。我们会尊重您的节奏，并提供心理支持。'
+      },
+      case7: {
+        opening: '您好，我先了解一下孩子既往诊断和家族情况。第一个孩子唇腭裂类型、治疗情况，以及双方家族中是否还有类似情况？',
+        explain: '多数非综合征性唇腭裂属于多因素遗传，复发风险通常是经验风险，不是简单的单基因遗传，也需要排除综合征线索。',
+        test: '建议复核患儿病历和畸形类型，进行家族史和综合征风险评估，并在再次妊娠时安排规范产前超声筛查。',
+        consent: '我们会说明经验风险、筛查局限和可选择的孕前及孕期管理方案，由你们在充分知情后决定下一步。'
+      },
+      case8: {
+        opening: '您好，我先了解一下视力下降情况。是单眼还是双眼？发病年龄、眼科检查结果，以及母系亲属中是否有人年轻时视力明显下降？',
+        explain: '年轻男性急性或亚急性视力下降需要考虑LHON等线粒体遗传病，但眼科表现不能直接等同于基因诊断。',
+        test: '建议先复核眼科资料，再进行线粒体DNA常见LHON相关变异检测，并系统收集母系家族史用于风险解释。',
+        consent: '基因检测可能影响本人诊断、母系亲属风险和生育咨询。我会先说明检测意义、局限和隐私问题，再由您决定。'
+      },
+      case9: {
+        opening: '您好，我先了解一下备孕和不育情况。备孕多久了？精液检查、性激素和睾丸发育情况如何？有没有做过染色体检查？',
+        explain: '男性不育可能与精液质量、内分泌、染色体异常或Y染色体微缺失有关。Klinefelter综合征需要结合核型等检查明确。',
+        test: '建议按精液分析、性激素检测、外周血染色体核型分析，必要时Y染色体微缺失检测的路径进行评估。',
+        consent: '检查结果可能影响辅助生殖方式、后代风险和伴侣共同决策。我会说明收益、局限和隐私保护，再由你们决定后续方案。'
+      }
     };
 
     const LOCAL_MATERIAL_LIBRARY = {
@@ -1028,6 +1080,7 @@
     let isTestRunning = false;
     let localModeActive = false;
     let lastLocalReply = '';
+    let recentLocalReplies = [];
     let dialogueState = {};
     let surfacedMaterialIds = [];
     let viewedMaterialIds = [];
@@ -1232,6 +1285,29 @@
       return words.some(word => text.includes(word.toLowerCase()));
     }
 
+    function isDirectTerminationAdvice(q) {
+      const protectivePhrases = [
+        '不会因为筛查高风险就直接建议终止妊娠',
+        '不直接建议终止妊娠',
+        '不能直接建议终止妊娠',
+        '避免直接建议终止妊娠',
+        '不建议直接终止妊娠',
+        '不是必须终止妊娠',
+        '不是马上终止妊娠',
+        '不是立刻终止妊娠',
+        '不会替您决定终止妊娠'
+      ];
+      if (includesAny(q, protectivePhrases)) return false;
+      return includesAny(q, ['必须终止', '立刻终止', '马上终止', '建议终止妊娠', '应该终止妊娠', '最好终止妊娠', '直接终止', '必须引产', '马上引产', '建议引产']);
+    }
+
+    function isAnxietyResponse(q) {
+      if (includesAny(q, ['理解您', '我理解', '能理解', '我能理解', '理解你', '先别急', '别太担心', '别担心', '陪您', '支持您', '担心是正常', '焦虑是正常', '紧张是正常', '害怕是正常'])) return true;
+      const emotionWords = ['焦虑', '紧张', '害怕', '担心', '难受', '压力'];
+      const responseWords = ['理解', '正常', '别急', '支持', '陪', '一步一步', '慢慢', '感受', '体会'];
+      return includesAny(q, emotionWords) && includesAny(q, responseWords);
+    }
+
     function updateDialogueStateFromStudent(text) {
       const q = normalizeText(text);
       if (includesAny(q, ['筛查不是诊断', '筛查不等于诊断', '筛查不能确诊', '不是诊断'])) {
@@ -1255,26 +1331,32 @@
       if (includesAny(q, ['产前诊断', '进一步诊断'])) {
         dialogueState.mentionedPrenatalDiagnosis = true;
       }
-      if (includesAny(q, ['焦虑', '紧张', '害怕', '担心', '理解您', '我理解', '先别急', '陪您'])) {
+      if (isAnxietyResponse(q)) {
         dialogueState.addressedAnxiety = true;
       }
-      if (includesAny(q, ['知情同意', '充分了解', '收益风险', '风险和局限', '替代方案'])) {
+      if (includesAny(q, ['知情同意', '充分知情', '充分了解', '收益风险', '风险和局限', '替代方案', '可选方案', '利弊', '检查风险'])) {
         dialogueState.mentionedConsent = true;
       }
-      if (includesAny(q, ['自主选择', '由您决定', '尊重', '自己决定', '共同决定'])) {
+      if (includesAny(q, ['自主选择', '自主决定', '慎重决定', '由您决定', '由你决定', '尊重', '自己决定', '共同决定', '一起决定', '和家人商量', '和家属商量', '和家人一起', '和家属一起', '由您和家属', '由您和家人'])) {
         dialogueState.respectedAutonomy = true;
       }
-      if (includesAny(q, ['必须终止', '立刻终止', '建议终止妊娠', '直接终止'])) {
+      if (isDirectTerminationAdvice(q)) {
         dialogueState.avoidedDirectTermination = false;
       }
     }
 
+    function rememberLocalReply(reply) {
+      lastLocalReply = reply;
+      recentLocalReplies.push(reply);
+      recentLocalReplies = recentLocalReplies.slice(-4);
+      return reply;
+    }
+
     function pickLocalReply(candidates) {
-      const filtered = candidates.filter(item => item !== lastLocalReply);
+      const filtered = candidates.filter(item => item !== lastLocalReply && !recentLocalReplies.includes(item));
       const pool = filtered.length ? filtered : candidates;
       const reply = pool[Math.floor(Math.random() * pool.length)];
-      lastLocalReply = reply;
-      return reply;
+      return rememberLocalReply(reply);
     }
 
     function getLocalProfileReply(caseData, q) {
@@ -1327,12 +1409,11 @@
 
       const profileReply = getLocalProfileReply(caseData, q);
       if (profileReply) {
-        lastLocalReply = profileReply;
-        return profileReply;
+        return rememberLocalReply(profileReply);
       }
 
       if (getTriggeredLocalMaterial(caseData.caseId, studentText)) {
-        return '我带了之前的检查报告和病历资料，但里面很多专业内容我看不懂。您可以先看看报告，再帮我解释一下这对现在的判断有什么意义吗？';
+        return rememberLocalReply('我带了之前的检查报告和病历资料，但里面很多专业内容我看不懂。您可以先看看报告，再帮我解释一下这对现在的判断有什么意义吗？');
       }
 
       if (caseData.caseId === 'case5' && isAskingForPriorReports(studentText)) {
@@ -1790,9 +1871,7 @@
         };
       }
 
-      const hasAnxietyResponse =
-        dialogueState.addressedAnxiety ||
-        includesAny(studentQ, ['理解您', '我理解', '能理解', '先别急', '陪您', '担心是正常', '焦虑', '紧张', '害怕']);
+      const hasAnxietyResponse = dialogueState.addressedAnxiety || isAnxietyResponse(studentQ);
       const hasConsentAndAutonomy =
         dialogueState.mentionedConsent &&
         dialogueState.respectedAutonomy;
@@ -1930,6 +2009,7 @@ ${escapeHtml(score.nextGoal)}
       conversationHistory = [];
       dialogueState = createDialogueState();
       lastLocalReply = '';
+      recentLocalReplies = [];
       surfacedMaterialIds = [];
       viewedMaterialIds = [];
       isLoading = false;
@@ -2115,19 +2195,19 @@ ${escapeHtml(score.nextGoal)}
       }
 
       if (type === 'information') {
-        return '医生，我把相关资料弄来了，您帮我看看这些资料有没有用，好吗？';
+        return `医生，我把《${testItem?.name || '相关资料'}》弄来了，但里面很多内容我看不懂。您帮我看看这份资料对判断有什么用，好吗？`;
       }
 
       if (type === 'genetic') {
-        return '医生，这个检查结果是不是已经出来了？是不是会更准确一点？您帮我看看吧。';
+        return `医生，《${testItem?.name || '遗传学检查'}》结果是不是已经出来了？这个结果会不会更接近最终判断，您帮我解释一下吧。`;
       }
 
       if (type === 'laboratory') {
-        return '医生，我检查做完了，您帮我看看结果吧。我还是有点担心，这个结果能说明问题吗？';
+        return `医生，《${testItem?.name || '这项检查'}》已经做完了。这个结果能说明什么，和我这次来咨询的问题关系大吗？`;
       }
 
       if (type === 'distractor') {
-        return '医生，这个检查结果出来了吗？我不太懂它和我现在担心的事情是不是有关系。';
+        return `医生，《${testItem?.name || '这个检查'}》结果出来了，但我不太懂它是不是和我最担心的问题有关。您能帮我判断一下价值大不大吗？`;
       }
 
       return '医生，我检查已经做完了，您帮我看看结果吧。';
@@ -2413,6 +2493,7 @@ ${escapeHtml(score.nextGoal)}
       researchSessionStartedAt = '';
       dialogueState = createDialogueState();
       lastLocalReply = '';
+      recentLocalReplies = [];
       surfacedMaterialIds = [];
       viewedMaterialIds = [];
       scoringBox.innerHTML = '结束问诊后生成评分反馈。';
@@ -2876,7 +2957,8 @@ ${escapeHtml(score.nextGoal)}
     document.querySelectorAll('button[data-demo]').forEach(btn => {
       btn.addEventListener('click', () => {
         const key = btn.getAttribute('data-demo');
-        messageInput.value = LOCAL_DEMO_INPUTS[key] || '';
+        const caseInputs = LOCAL_DEMO_INPUTS_BY_CASE[caseSelect.value] || LOCAL_DEMO_INPUTS_BY_CASE.case4;
+        messageInput.value = caseInputs[key] || '';
         messageInput.focus();
       });
     });
