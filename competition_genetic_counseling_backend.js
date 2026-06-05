@@ -3274,12 +3274,27 @@ function keywordIncludes(question, keywords) {
 
 function isReportRequest(question) {
   const q = String(question || '').toLowerCase().replace(/\s+/g, '');
+  const isConsentOrResultExplanation = keywordIncludes(q, [
+    '正式开立检查前',
+    '计划说明清楚',
+    '是否愿意',
+    '您理解这些目的',
+    '目的、可能结果和局限',
+    '目的、收益、风险和局限',
+    '本轮资料和检查结果',
+    '放在一起解释',
+    '综合来看',
+    '检查结果',
+    '最后我总结'
+  ]);
+  if (isConsentOrResultExplanation) return false;
+
   const hasMaterialObject = keywordIncludes(q, ['报告', '病历', '资料', '记录', '检查单']);
   const hasPriorContext = keywordIncludes(q, ['以前', '之前', '既往', '外院', '原来', '过去', '带了', '带来', '已有', '做过']);
   const hasViewIntent = keywordIncludes(q, ['有没有', '有没有带', '有带', '带了吗', '带来了吗', '能看看', '给我看看', '可以看', '查看', '看一下', '调取', '复核', '提供', '提交']);
   const asksPriorExamHistory = keywordIncludes(q, ['以前做过什么检查', '之前做过什么检查', '既往做过什么检查', '以前做过哪些检查', '之前做过哪些检查', '查过什么']);
 
-  return (hasMaterialObject && (hasPriorContext || hasViewIntent)) || asksPriorExamHistory;
+  return (hasMaterialObject && hasPriorContext && hasViewIntent) || asksPriorExamHistory;
 }
 
 function getReportRequestReply(caseId) {
@@ -3295,6 +3310,102 @@ function getReportRequestReply(caseId) {
     case9: '既往精液检查报告我带来了。医生说精子数量问题比较重，所以建议我继续查激素和染色体这些原因。'
   };
   return replies[caseId] || '之前的资料我带来了，但很多专业内容我看不懂。您可以先帮我看看报告。';
+}
+
+function isConsentPrompt(question) {
+  const q = String(question || '').replace(/\s+/g, '');
+  return keywordIncludes(q, [
+    '正式开立检查前',
+    '计划说明清楚',
+    '是否愿意按这个路径继续',
+    '您理解这些目的',
+    '目的、可能结果和局限后'
+  ]);
+}
+
+function getConsentAcknowledgementReply(caseId) {
+  const replies = {
+    case1: '我理解了。也就是说，先看清楚家里亲属的资料，再判断我自己是不是携带者，这样才能谈以后生育风险。我愿意先按您说的路径查下去。',
+    case2: '我理解了，这些检查主要是为了分清是不是地贫携带，以及我们两个人组合起来对孩子有没有风险。我们愿意一起检查。',
+    case3: '我理解了。我们愿意先把夫妻双方染色体和既往流产资料系统看清楚，再谈下一步怎么备孕。',
+    case4: '我理解了。唐筛和无创还不是最终诊断，羊水穿刺能更明确，但也有一定风险。我愿意在知情后继续做这些检查。',
+    case5: '我理解了。先查染色体、盆腔情况和相关并发症筛查，是为了弄清楚闭经和身高问题的原因。我愿意继续检查。',
+    case6: '我理解了，这不是普通体检，尤其是我自己的预测性检测会影响很大。我愿意先按流程复核父亲资料、完成心理评估，并在确认知情后继续。',
+    case7: '我理解了。先看孩子既往资料、评估家系和孕前风险因素，是为了判断下一胎风险和能做哪些准备。我们愿意继续。',
+    case8: '我理解了。眼科资料、母系家族史和线粒体DNA检测要结合起来看，而且结果可能影响家里其他亲属。我愿意继续检查。',
+    case9: '我理解了。先看精液、激素和染色体，是为了判断不育原因和以后还能有哪些选择。我愿意继续检查。'
+  };
+  return replies[caseId] || '我理解这些检查的目的、可能结果和局限，也愿意在知情后继续。';
+}
+
+function isIntegratedResultExplanation(question) {
+  const q = String(question || '').replace(/\s+/g, '');
+  return keywordIncludes(q, [
+    '本轮资料和检查结果放在一起解释',
+    '综合来看',
+    '检查路径主要服务于',
+    '接下来我会说明这些结果'
+  ]);
+}
+
+function getIntegratedResultPatientReply(caseId) {
+  const replies = {
+    case1: '这样我就明白了，我确实是血友病A携带者。那我最关心的是以后怀孕时怎么判断孩子有没有风险，以及婚前我们还需要和家里怎么沟通。',
+    case2: '也就是说，我们两个人都和地中海贫血有关，孩子可能会有重型风险，对吗？那下一步是不是要做产前诊断或者提前讨论生育选择？',
+    case3: '所以问题主要在我爱人的平衡易位，而不是我身体保不住。那我们以后还有机会怀上健康孩子吗？自然怀孕和PGT分别怎么考虑？',
+    case4: '医生，我现在知道羊水结果已经能支持21三体诊断了，心里还是很难受。您能不能再帮我讲清楚孩子可能面临的问题，以及我们可以怎么做决定？',
+    case5: '医生，我大概明白了，染色体结果和Turner综合征有关。那我后面是不是要长期治疗和随访？月经、身高和以后生育还能怎么管理？',
+    case6: '这个结果对我冲击很大。我想知道它是不是意味着我将来一定会发病，大概什么时候发病，以及以后如果要孩子有没有避免遗传的办法。',
+    case7: '我明白了，再发风险比普通人高，但不是一定会再发生。那如果下次怀孕，什么时候做超声比较合适？孕前还要做哪些准备？',
+    case8: '我明白了，这更像线粒体DNA相关问题。那我是男性的话，以后会不会传给孩子？我妈妈那边亲属是不是也需要来咨询？',
+    case9: '我明白了，47,XXY能解释我的不育问题。那我还有没有可能通过辅助生殖拥有自己的孩子？后面还需要治疗雄激素问题吗？'
+  };
+  return replies[caseId] || '我大概明白结果的意思了，但还想知道这对后续诊断、风险和选择具体有什么影响。';
+}
+
+function isClosingSummary(question) {
+  const q = String(question || '').replace(/\s+/g, '');
+  return keywordIncludes(q, ['最后我总结一下', '本次咨询的重点是']);
+}
+
+function getClosingPatientReply(caseId) {
+  const replies = {
+    case4: '谢谢医生，我知道现在不能急着让别人替我决定。我会和家人一起听完信息，再慎重考虑下一步。',
+    case6: '谢谢医生。我现在还是难受，但至少知道这个检测和后续决定都要慢慢来，也知道自己有权利寻求心理支持和家人支持。'
+  };
+  return replies[caseId] || '谢谢医生，我现在比刚来时清楚多了。接下来我会结合检查结果和家人一起认真考虑后续选择。';
+}
+
+function isHypotheticalDownDiagnosisExplanation(caseId, question, history = []) {
+  if (caseId !== 'case4' || hasConfirmedDownDiagnosis(history)) return false;
+  const q = String(question || '').replace(/\s+/g, '');
+  return keywordIncludes(q, [
+    '如果诊断结果确认21三体',
+    '如果确诊21三体',
+    '如果结果确认21三体',
+    '如果羊水穿刺结果确认'
+  ]);
+}
+
+function getHypotheticalDownDiagnosisReply() {
+  return '医生，我明白您现在是在讲“如果后面确诊”的情况，不是说现在已经确诊了。那我想先把确诊流程和可能结果弄清楚，再决定要不要做羊水穿刺。';
+}
+
+function isCase3PretestKaryotypeQuestion(caseId, question, history = []) {
+  if (caseId !== 'case3') return false;
+  const completedKaryotype = (history || []).some(item => String(item.content || '').includes('夫妻双方外周血染色体核型分析'));
+  if (completedKaryotype) return false;
+  const q = String(question || '').replace(/\s+/g, '');
+  return keywordIncludes(q, [
+    '夫妻双方以前有没有做过外周血染色体核型分析',
+    '有没有做过外周血染色体核型',
+    '有没有做过染色体核型',
+    '双方有没有查过染色体'
+  ]);
+}
+
+function getCase3PretestKaryotypeReply() {
+  return '以前没有完整做过夫妻双方外周血染色体核型分析。前面医生只是建议我们这次应该把夫妻双方都系统评估一下，所以我们才来咨询下一步怎么查。';
 }
 
 function isTerminationRequest(caseId, question) {
@@ -4960,7 +5071,22 @@ app.post('/api/chat', async (req, res) => {
     let actualMode = currentMode;
     const reportRequest = isReportRequest(message);
 
-    if (isTerminationRequest(caseId, message)) {
+    if (isConsentPrompt(message)) {
+      reply = getConsentAcknowledgementReply(caseId);
+      actualMode = currentMode === 'ai' ? 'ai-consent-rule' : 'mock-consent-rule';
+    } else if (isIntegratedResultExplanation(message)) {
+      reply = getIntegratedResultPatientReply(caseId);
+      actualMode = currentMode === 'ai' ? 'ai-result-rule' : 'mock-result-rule';
+    } else if (isClosingSummary(message)) {
+      reply = getClosingPatientReply(caseId);
+      actualMode = currentMode === 'ai' ? 'ai-closing-rule' : 'mock-closing-rule';
+    } else if (isHypotheticalDownDiagnosisExplanation(caseId, message, history)) {
+      reply = getHypotheticalDownDiagnosisReply();
+      actualMode = currentMode === 'ai' ? 'ai-hypothetical-rule' : 'mock-hypothetical-rule';
+    } else if (isCase3PretestKaryotypeQuestion(caseId, message, history)) {
+      reply = getCase3PretestKaryotypeReply();
+      actualMode = currentMode === 'ai' ? 'ai-pretest-rule' : 'mock-pretest-rule';
+    } else if (isTerminationRequest(caseId, message)) {
       reply = hasConfirmedDownDiagnosis(history)
         ? getPostDiagnosisDownDecisionReply()
         : getTerminationConcernReply();
