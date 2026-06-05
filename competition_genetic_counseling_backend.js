@@ -3376,6 +3376,67 @@ function getClosingPatientReply(caseId) {
   return replies[caseId] || '谢谢医生，我现在比刚来时清楚多了。接下来我会结合检查结果和家人一起认真考虑后续选择。';
 }
 
+function isFinalActionPlanPrompt(question) {
+  const q = String(question || '').replace(/\s+/g, '');
+  return keywordIncludes(q, [
+    '结束前我直接回答',
+    '结束前我把两条路径',
+    '结束前我把未来生育路径',
+    '结束前我回答超声时点',
+    '结束前我把遗传问题',
+    '结束前我会直接回答'
+  ]);
+}
+
+function getFinalActionPlanAcknowledgement(caseId) {
+  const replies = {
+    case1: '我明白了，自然怀孕后可以到产前诊断中心选择合适时点做针对家系变异的诊断。我会先保存好报告，也会和未婚夫一起去做孕前咨询。',
+    case2: '我们明白了，现在先复核双方具体变异，不是现在去做羊水穿刺。以后可以在自然怀孕后做产前诊断，也可以提前了解PGT-M。',
+    case3: '我们明白了，自然妊娠和PGT-SR各有利弊，不能只看一个成功率。下一步先去生殖遗传专科结合年龄、卵巢情况和易位类型做个体化评估。',
+    case4: '我明白了。继续妊娠和终止妊娠都有具体的医学流程和支持，我会和家人一起进一步咨询产科，在充分知情后再决定。',
+    case5: '我明白了，下一步先去内分泌科和妇科完善激素、骨健康和生殖系统评估，再根据骨龄和身体情况制定治疗与生育咨询计划。',
+    case6: '我明白了，未来有自然妊娠、产前诊断和PGT-M等不同路径，但我现在不需要马上决定。我会先接受心理支持和神经科基线评估。',
+    case7: '我明白了，中孕期系统超声更适合观察唇腭部，但正常结果也不能完全排除，尤其是单纯腭裂。我会按产科建议补充叶酸并安排规范超声。',
+    case8: '我明白了，按照通常的线粒体遗传规律，我作为男性一般不会把这个变异传给孩子；母系亲属应先咨询，再自愿决定是否检测。',
+    case9: '我明白了，如果想保留自己的生育机会，应先做生殖男科和取精评估，不能自行先用雄激素。之后再协调生育计划和长期内分泌治疗。'
+  };
+  return replies[caseId] || '我明白今天的结果和下一步行动计划了，目前没有必须立刻解决的其他问题，我会按计划复诊。';
+}
+
+function isPostDiagnosisCounselingPrompt(caseId, question) {
+  const q = String(question || '').replace(/\s+/g, '');
+  if (caseId === 'case4') {
+    return keywordIncludes(q, [
+      '羊水核型47,XX,+21属于诊断性结果',
+      '接下来可以分别讨论继续妊娠和终止妊娠'
+    ]);
+  }
+  if (caseId === 'case6') {
+    return keywordIncludes(q, [
+      '检测到HTT致病性CAG重复扩增',
+      '生育方面，每个子女通常有二分之一概率'
+    ]);
+  }
+  return false;
+}
+
+function getPostDiagnosisCounselingReply(caseId, question) {
+  const q = String(question || '').replace(/\s+/g, '');
+  if (caseId === 'case4') {
+    if (q.includes('接下来可以分别讨论')) {
+      return '我希望先把两种选择的实际流程都了解清楚：如果继续妊娠，孩子出生后需要哪些医疗和康复支持；如果考虑终止妊娠，我应该尽快到哪里进一步咨询。了解这些以后，我再和家人慎重决定。';
+    }
+    return '我明白核型已经能支持诊断，但严重程度不能只靠核型预测。我现在最需要了解的是继续妊娠后的医疗支持，以及不同选择分别要面对什么。';
+  }
+  if (caseId === 'case6') {
+    if (q.includes('生育方面')) {
+      return '我明白孩子会有二分之一风险，也知道以后有产前诊断和PGT-M等选择。今天我想先自己消化结果并接受心理支持，等状态稳定后再专门讨论生育方案。';
+    }
+    return '我明白结果提示未来发病风险很高，但发病时间和轻重不能准确预测。现在我最需要的是心理支持、随访计划，以及弄清楚以后怎样和伴侣讨论这件事。';
+  }
+  return '我理解结果的主要含义，也希望继续了解下一步支持和选择。';
+}
+
 function isHypotheticalDownDiagnosisExplanation(caseId, question, history = []) {
   if (caseId !== 'case4' || hasConfirmedDownDiagnosis(history)) return false;
   const q = String(question || '').replace(/\s+/g, '');
@@ -5077,6 +5138,12 @@ app.post('/api/chat', async (req, res) => {
     } else if (isIntegratedResultExplanation(message)) {
       reply = getIntegratedResultPatientReply(caseId);
       actualMode = currentMode === 'ai' ? 'ai-result-rule' : 'mock-result-rule';
+    } else if (isFinalActionPlanPrompt(message)) {
+      reply = getFinalActionPlanAcknowledgement(caseId);
+      actualMode = currentMode === 'ai' ? 'ai-final-plan-rule' : 'mock-final-plan-rule';
+    } else if (isPostDiagnosisCounselingPrompt(caseId, message)) {
+      reply = getPostDiagnosisCounselingReply(caseId, message);
+      actualMode = currentMode === 'ai' ? 'ai-post-diagnosis-rule' : 'mock-post-diagnosis-rule';
     } else if (isClosingSummary(message)) {
       reply = getClosingPatientReply(caseId);
       actualMode = currentMode === 'ai' ? 'ai-closing-rule' : 'mock-closing-rule';
