@@ -4912,7 +4912,7 @@ async function generateAIReply(caseData, question, history = []) {
     ],
     stream: false,
     temperature: 0.7,
-    max_tokens: 180
+    max_tokens: 320
   });
 
   const rawReply = response.choices?.[0]?.message?.content?.trim() || getProgressivePatientReply(caseData, history);
