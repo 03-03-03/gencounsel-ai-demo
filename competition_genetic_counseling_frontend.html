@@ -1249,7 +1249,11 @@
       const hasMaterialObject = includesAny(q, ['报告', '病历', '资料', '记录', '检查单']);
       const hasPriorContext = includesAny(q, ['以前', '之前', '既往', '外院', '原来', '过去', '带了', '带来', '已有', '做过']);
       const hasViewIntent = includesAny(q, ['有没有', '有没有带', '有带', '带了吗', '带来了吗', '能看看', '给我看看', '可以看', '查看', '看一下', '调取', '复核', '提供', '提交']);
-      const asksPriorExamHistory = includesAny(q, ['以前做过什么检查', '之前做过什么检查', '既往做过什么检查', '以前做过哪些检查', '之前做过哪些检查', '查过什么']);
+      const asksPriorExamHistory = includesAny(q, [
+        '以前做过什么检查', '之前做过什么检查', '既往做过什么检查', '以前做过哪些检查', '之前做过哪些检查', '查过什么',
+        '舅舅做过检查吗', '舅舅有去做过检查吗', '亲属做过检查吗', '父亲做过检查吗', '孩子做过检查吗',
+        '有没有以前的检查', '有没有之前的检查', '既往检查带了吗', '检查资料带了吗', '检查报告带了吗'
+      ]);
 
       return (hasMaterialObject && (hasPriorContext || hasViewIntent)) || asksPriorExamHistory;
     }
