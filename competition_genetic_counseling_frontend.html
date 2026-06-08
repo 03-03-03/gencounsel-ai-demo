@@ -1333,10 +1333,10 @@
       if (isAnxietyResponse(q)) {
         dialogueState.addressedAnxiety = true;
       }
-      if (includesAny(q, ['知情同意', '充分知情', '充分了解', '收益风险', '风险和局限', '替代方案', '可选方案', '利弊', '检查风险'])) {
+      if (includesAny(q, ['知情同意', '充分知情', '充分了解', '收益风险', '风险和局限', '替代方案', '可选方案', '利弊', '检查风险', '是否愿意', '您愿意', '如果您愿意', '可以的话', '帮您预约', '征得同意', '确认您理解', '同意后'])) {
         dialogueState.mentionedConsent = true;
       }
-      if (includesAny(q, ['自主选择', '自主决定', '慎重决定', '由您决定', '由你决定', '尊重', '自己决定', '共同决定', '一起决定', '和家人商量', '和家属商量', '和家人一起', '和家属一起', '由您和家属', '由您和家人'])) {
+      if (includesAny(q, ['自主选择', '自主决定', '慎重决定', '由您决定', '由你决定', '尊重', '自己决定', '共同决定', '一起决定', '和家人商量', '和家属商量', '和家人一起', '和家属一起', '由您和家属', '由您和家人', '您可以选择', '可以暂缓', '不急着决定', '考虑好了', '好好想想', '再做决定'])) {
         dialogueState.respectedAutonomy = true;
       }
       if (isDirectTerminationAdvice(q)) {
@@ -1871,9 +1871,13 @@
       }
 
       const hasAnxietyResponse = dialogueState.addressedAnxiety || isAnxietyResponse(studentQ);
-      const hasConsentAndAutonomy =
-        dialogueState.mentionedConsent &&
-        dialogueState.respectedAutonomy;
+      const hasPurposeExplanation = includesAny(studentQ, ['帮助判断', '帮助明确', '判断您是否', '明确您是否', '评估风险', '对以后要孩子', '检测目的', '检查目的']);
+      const hasConsentEvidence = dialogueState.mentionedConsent || includesAny(studentQ, ['是否愿意', '您愿意', '如果您愿意', '可以的话', '帮您预约', '征得同意', '确认您理解', '同意后']);
+      const hasAutonomyEvidence = dialogueState.respectedAutonomy || includesAny(studentQ, ['由您决定', '您可以选择', '可以暂缓', '不急着决定', '考虑好了', '好好想想', '和家人商量', '和家属商量', '再做决定', '尊重您的选择']);
+      const hasLimitationsExplanation = includesAny(studentQ, ['风险和局限', '风险与局限', '检查局限', '检测局限', '不能保证', '不能完全', '可能无法', '替代方案', '隐私', '家系影响']);
+      const hasSevereDirectiveAdvice = isDirectTerminationAdvice(studentQ);
+      const hasPrematureTerminationOption = includesAny(studentQ, ['可以选择引产', '可以考虑引产', '可以选择终止妊娠']);
+      const hasConsentAndAutonomy = hasConsentEvidence && hasAutonomyEvidence;
 
       let medical = 6 + Math.min(termHits, 5) * 3;
       if (keyHits >= 1) medical += 2;
@@ -1895,10 +1899,14 @@
       empathy = Math.min(20, empathy);
 
       let ethics = 0;
-      if (dialogueState.mentionedConsent) ethics += 5;
-      if (dialogueState.respectedAutonomy) ethics += 4;
-      if (selectedCaseId === 'case4' && dialogueState.avoidedDirectTermination) ethics += 4;
-      if (selectedCaseId === 'case4' && !dialogueState.avoidedDirectTermination) ethics -= 5;
+      if (hasPurposeExplanation) ethics += 2;
+      if (hasConsentEvidence) ethics += 3;
+      if (hasAutonomyEvidence) ethics += 3;
+      if (hasLimitationsExplanation) ethics += 2;
+      if (hasConsentAndAutonomy) ethics += 2;
+      if (hasAutonomyEvidence && !hasSevereDirectiveAdvice && !hasPrematureTerminationOption) ethics += 3;
+      if (hasPrematureTerminationOption) ethics -= 2;
+      if (hasSevereDirectiveAdvice) ethics -= 5;
       ethics = Math.max(0, Math.min(15, ethics));
 
       let language = 3;
@@ -1916,12 +1924,14 @@
       if (pathway >= 20) strengths.push(profile.testStrength);
       if (hasAnxietyResponse && empathy >= 12) strengths.push('能回应患者焦虑，沟通语气较稳定。');
       if (ethics >= 12) strengths.push('体现知情同意和自主选择，未直接替患者做决定。');
+      else if (ethics >= 6) strengths.push('已通过解释检查目的、征求意愿或共同商议体现部分知情参与。');
 
       if (termHits < 2) gaps.push(profile.missingConcept);
       if (keyHits === 0) gaps.push(profile.missingPathway);
       if (!hasAnxietyResponse) gaps.push('对患者焦虑的回应不足。');
-      if (!hasConsentAndAutonomy) gaps.push('知情同意和自主选择表达还可加强。');
-      if (selectedCaseId === 'case4' && !dialogueState.avoidedDirectTermination) gaps.push('出现了过早或直接建议终止妊娠的表达，需要避免。');
+      if (!hasConsentAndAutonomy) gaps.push('尚未同时体现征求患者意愿和自主选择。');
+      else if (ethics < 12) gaps.push('虽已体现部分知情参与，但检查风险、局限、替代方案或非指令性表达仍不完整。');
+      if (hasPrematureTerminationOption || hasSevereDirectiveAdvice) gaps.push('较早提出引产或终止妊娠，容易形成导向，应先完整说明预后与所有可选路径。');
 
       suggestions.push(`先回应患者担忧，再围绕“${profile.diagnosisName}”解释医学判断依据。`);
       suggestions.push(`检查路径建议按“${profile.pathwayName}”组织，避免被干扰项带偏。`);
@@ -1945,12 +1955,12 @@
       return '待提升：建议回到病例目标重新训练';
     }
 
-    function renderLocalScore() {
-      const score = buildLocalScore();
+    function renderScore(score, sourceLabel = '本地规则评分') {
       scoringBox.innerHTML = `
         <div class="score-card">
           <div class="score-total">总分：${score.total}/100</div>
           <div class="score-level">${escapeHtml(getScoreLevel(score.total))}</div>
+          <div class="tiny">评分方式：${escapeHtml(sourceLabel)}</div>
           <div class="score-grid">
             <div>医学准确性：${score.dimensions.medical}/30</div>
             <div>检查/干预路径：${score.dimensions.pathway}/25</div>
@@ -1975,6 +1985,46 @@ ${escapeHtml(score.nextGoal)}
         </div>
       `;
       return score;
+    }
+
+    function renderLocalScore() {
+      return renderScore(buildLocalScore(), '本地规则回退');
+    }
+
+    async function requestAIScore(localScore) {
+      const chatUrl = apiEndpoint.value.trim();
+      if (!chatUrl) {
+        throw new Error('未配置AI后端地址。');
+      }
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000);
+
+      try {
+        const response = await fetch(`${getBaseApiUrl(chatUrl)}/api/score`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
+          body: JSON.stringify({
+            caseId: caseSelect.value,
+            caseTitle: cases[caseSelect.value]?.title || '',
+            history: conversationHistory,
+            completedTests: [...completedTests],
+            viewedMaterialIds: [...viewedMaterialIds],
+            localScore
+          })
+        });
+        const data = await safeReadJson(response);
+        if (!response.ok || !data.ok || !data.score || !data.score.dimensions) {
+          throw new Error(data.error || `AI评分接口异常：${response.status}`);
+        }
+        return {
+          score: data.score,
+          sourceLabel: `AI量表评分（${data.model || '在线模型'}）`
+        };
+      } finally {
+        clearTimeout(timeoutId);
+      }
     }
 
     function setChatPlaceholder(text) {
@@ -2830,7 +2880,7 @@ ${escapeHtml(score.nextGoal)}
       }
     }
 
-    function endConsultation() {
+    async function endConsultation() {
       if (!started) {
         appendMessage('system', '当前还没有开始问诊。');
         return;
@@ -2844,9 +2894,28 @@ ${escapeHtml(score.nextGoal)}
       consultationEnded = true;
       setChatControlsDisabled(true);
       renderTests();
-      const finalScore = renderLocalScore();
+      const localScore = buildLocalScore();
+      scoringBox.innerHTML = '<div class="score-card"><strong>正在进行AI量表评分，请稍候……</strong><div class="tiny">系统将核对完整对话、检查选择和知情同意证据。</div></div>';
+      statusBox.value = '问诊已结束，正在生成AI五维评分……';
+
+      let finalScore;
+      let scoreSource = 'local-rule-fallback';
+      let fallbackReason = '';
+      try {
+        const aiResult = await requestAIScore(localScore);
+        finalScore = renderScore(aiResult.score, aiResult.sourceLabel);
+        scoreSource = 'ai-rubric';
+      } catch (error) {
+        console.error('AI评分失败，已回退本地评分：', error);
+        fallbackReason = error.name === 'AbortError' ? 'AI评分请求超时' : error.message;
+        finalScore = renderScore(localScore, `本地规则回退（${fallbackReason}）`);
+      }
+
       logResearchEvent('final_score', {
         score: finalScore,
+        localScoreBaseline: localScore,
+        scoreSource,
+        fallbackReason,
         completedTests: [...completedTests],
         viewedMaterialIds: [...viewedMaterialIds],
         dialogueState: { ...dialogueState },
@@ -2855,7 +2924,7 @@ ${escapeHtml(score.nextGoal)}
         endedAt: new Date().toISOString()
       });
       statusBox.value = `本轮问诊已结束，共记录 ${conversationHistory.length} 条对话。`;
-      appendMessage('system', '本轮问诊已结束。右侧已生成五维评分反馈，可继续查看已完成检查结果。');
+      appendMessage('system', `本轮问诊已结束。右侧已生成五维评分反馈（${scoreSource === 'ai-rubric' ? 'AI量表评分' : '本地规则回退'}），可继续查看已完成检查结果。`);
     }
 
     function getVisibleChatLinesForCopy() {
