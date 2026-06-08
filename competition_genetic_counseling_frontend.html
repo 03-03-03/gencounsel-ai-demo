@@ -773,7 +773,7 @@
         tests: [
           { testId: 'case5_karyotype', name: '外周血染色体核型分析', type: 'genetic', resultTitle: '染色体核型分析', resultText: '45,X/46,XX嵌合，支持Turner综合征相关诊断。', teachingValue: '性染色体核型是诊断Turner综合征的重要依据。' },
           { testId: 'case5_ultrasound', name: '盆腔超声', type: 'laboratory', resultTitle: '盆腔超声', resultText: '子宫偏小，双侧卵巢显示不清。', teachingValue: '用于评估性腺发育及生殖系统情况。' },
-          { testId: 'case5_heart', name: '心脏及肾脏结构评估', type: 'laboratory', resultTitle: '并发症筛查', resultText: '建议进一步评估心血管和肾脏结构风险。', teachingValue: 'Turner综合征咨询应包含系统健康管理。' },
+          { testId: 'case5_heart', name: '心脏及肾脏结构评估', type: 'laboratory', resultTitle: '并发症筛查', resultText: '心脏超声未见明确主动脉缩窄或严重结构异常；肾脏超声未见明显先天性结构异常。仍建议结合血压及专科意见制定长期随访计划。', teachingValue: 'Turner综合征咨询应包含心血管、血压和肾脏系统健康管理。' },
           { testId: 'case5_metabolic', name: '常规代谢指标', type: 'distractor', resultTitle: '代谢指标', resultText: '未见特异性异常。', teachingValue: '不能替代染色体诊断。' }
         ]
       },
@@ -861,7 +861,7 @@
       case2: {
         opening: '您好，我先了解一下双方情况。你们之前血常规有没有提示MCV或MCH偏低？双方有没有做过地中海贫血筛查或基因检测？',
         explain: '小细胞低色素只是提示线索，不能直接确诊地中海贫血。关键要看双方是否携带同一类型相关变异，因为这会影响后代重型地贫风险。',
-        test: '建议按血常规红细胞指数、铁代谢鉴别、HbA2或血红蛋白分析、夫妻双方地贫基因检测的路径来判断风险。',
+        test: '如果既往血常规资料可以复核，可在现有红细胞指数基础上选择HbA2或血红蛋白分析，并以夫妻双方地贫基因检测确认基因型；铁代谢在缺铁不能排除时按需补充。',
         consent: '我会把筛查和基因检测的目的、可能结果、局限及对生育选择的影响说明清楚，再由你们共同决定是否进一步检查。'
       },
       case3: {
@@ -1690,7 +1690,7 @@
           keyTests: ['case2_blood', 'case2_hb_analysis', 'case2_gene'],
           supportiveTests: ['case2_iron'],
           distractorTests: ['case2_liver'],
-          pathwayName: '血液学筛查、HbA2定量分析、铁代谢鉴别和夫妻双方HBB基因检测',
+          pathwayName: '复核既往红细胞指数后进行HbA2/血红蛋白分析和夫妻HBB检测，铁代谢按需鉴别',
           diagnosisName: '夫妻双方地中海贫血携带与后代重型地贫风险咨询',
           testStrength: '检查路径能从红细胞指数复核进入HbA2/血红蛋白分析和夫妻双方HBB基因检测，并注意与缺铁性贫血鉴别。',
           conceptStrength: '能围绕地中海贫血携带、夫妻同型携带和后代风险进行解释。',
@@ -1885,9 +1885,17 @@
       if (selectedCaseId === 'case4' && dialogueState.explainedHighRiskNotConfirmed) medical += 2;
       medical = Math.min(30, medical);
 
-      let pathway = 4 + Math.min(completedTests.length, 3) * 3;
-      pathway += keyHits * 5 + supportiveHits * 2;
-      if (keyHits === 0 && distractorHits > 0) pathway -= 4;
+      const keyCoverage = profile.keyTests.length ? keyHits / profile.keyTests.length : 0;
+      const hasTestRationale = includesAny(studentQ, ['建议先做', '建议检查', '为了明确', '帮助判断', '帮助确认', '用于判断', '用于确认', '排除', '鉴别']);
+      const hasResultIntegration = includesAny(studentQ, ['根据结果', '目前结果', '结果提示', '结果显示', '这意味着', '综合来看', '可以诊断', '支持诊断', '提示您是']);
+      const hasPathwayPlan = includesAny(studentQ, ['下一步', '自然怀孕', '产前诊断', '羊水穿刺', '绒毛', 'pgt', '辅助生殖', '长期随访', '转诊', '心理评估', '预测性检测', '暂不检测', '不检测', '叶酸', '目标超声', '系统超声', '心脏', '肾脏', '母系亲属', '生殖医学', '性激素']);
+
+      let pathway = 5 + Math.round(keyCoverage * 14);
+      if (hasTestRationale) pathway += 2;
+      if (hasResultIntegration) pathway += 2;
+      if (hasPathwayPlan) pathway += 2;
+      pathway += Math.min(supportiveHits, 2);
+      pathway -= distractorHits * 3;
       if (selectedCaseId === 'case4' && dialogueState.mentionedAmniocentesis) pathway += 2;
       if (dialogueState.mentionedKaryotype || dialogueState.mentionedPrenatalDiagnosis) pathway += 1;
       pathway = Math.max(0, Math.min(25, pathway));
